@@ -8,6 +8,7 @@ const BookingPage = lazy(() => import('./pages/BookingPage'));
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 const MyBookingsPage = lazy(() => import('./pages/MyBookingsPage'));
+const BookingConfirmationPage = lazy(() => import('./pages/BookingConfirmationPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 import GalleryPage from './pages/GalleryPage';
 import AboutPage from './pages/AboutPage';
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/destinations" element={<DestinationsPage />} />
         <Route path="/packages/:id" element={<PackagePage />} />
         <Route path="/booking" element={<BookingPage />} />
+        <Route path="/booking/confirmation/:reference" element={<BookingConfirmationPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/my-bookings" element={<MyBookingsPage />} />

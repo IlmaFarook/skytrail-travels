@@ -1,17 +1,19 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useRules } from '../context/SiteContext';
 import usePageMeta from '../hooks/usePageMeta';
+import { emailAttrs } from '../lib/forms';
+import { safePath, homeFor } from '../lib/access';
 
 
 export default function LoginPage() {
   const { t } = useTranslation();
   usePageMeta(t('meta.login.title'), t('meta.login.description'));
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const { emailOk } = useRules();
-  const navigate = useNavigate();
+  const { state } = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -27,12 +29,14 @@ export default function LoginPage() {
     if (Object.keys(errs).length) { setAlert(t('validation.fixHighlighted')); return; }
 
     try {
-      const user = await login(email.trim(), password);
-      navigate(user.role === 'admin' ? '/admin' : '/');
+      await login(email.trim(), password); // the redirect below takes over once the user is set
     } catch (err) {
       setAlert(err.message || t('auth.login.failed'));
     }
   };
+
+  // already signed in: there is nothing to do here
+  if (user) return <Navigate to={safePath(state?.from) || homeFor(user)} replace />;
 
   return (
     <>
@@ -42,7 +46,7 @@ export default function LoginPage() {
         <form className="form-card" onSubmit={onSubmit} noValidate>
           <div className={`form-group${errors.email ? ' has-error' : ''}`}>
             <label htmlFor="email">{t('auth.login.email')}</label>
-            <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} />
+            <input id="email" {...emailAttrs} value={email} onChange={e => setEmail(e.target.value)} />
             <div className="error-text">{t('validation.email')}</div>
           </div>
           <div className={`form-group${errors.password ? ' has-error' : ''}`}>

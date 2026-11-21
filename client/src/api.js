@@ -9,6 +9,9 @@ async function request(path, options = {}) {
   });
   const isJson = res.headers.get('content-type')?.includes('application/json');
   const data = isJson ? await res.json() : null;
+  if (res.status === 401 && !path.startsWith('/auth/')) {
+    window.dispatchEvent(new Event('session-expired')); // the login ran out, send them to the login page
+  }
   if (!res.ok) {
     const error = new Error(data?.error || t('errors.requestFailed', { status: res.status }));
     error.status = res.status;
@@ -24,6 +27,7 @@ export const api = {
     const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v));
     return request('/packages' + (qs.toString() ? `?${qs}` : ''));
   },
+  suggest: (q) => request(`/suggest?q=${encodeURIComponent(q)}`),
   getPackage: (id) => request(`/packages/${id}`),
   compare: (ids) => request(`/compare?ids=${ids.join(',')}`),
   getTestimonials: () => request('/testimonials'),
@@ -38,6 +42,7 @@ export const api = {
   createBooking: (payload) =>
     request('/bookings', { method: 'POST', body: JSON.stringify(payload) }),
   myBookings: () => request('/bookings/mine'),
+  bookingByReference: (reference) => request(`/bookings/reference/${encodeURIComponent(reference)}`),
 
   sendContact: (payload) =>
     request('/contact', { method: 'POST', body: JSON.stringify(payload) }),

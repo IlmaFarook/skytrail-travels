@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { api } from '../api';
 import PackageCard from '../components/PackageCard';
+import SearchBox from '../components/SearchBox';
 import DestinationImage from '../components/DestinationImage';
 import { useSite } from '../context/SiteContext';
 import { useCurrency } from '../context/CurrencyContext';
@@ -13,10 +14,8 @@ const reasonIds = ['expertise', 'pricing', 'support'];
 export default function HomePage() {
   const { t } = useTranslation();
   usePageMeta(t('meta.home.title'), t('meta.home.description'));
-  const navigate = useNavigate();
   const { business, stats } = useSite();
   const { currency } = useCurrency();
-  const [query, setQuery] = useState('');
   const [packages, setPackages] = useState(null);
   const [destinations, setDestinations] = useState([]);
   const [testimonials, setTestimonials] = useState(null);
@@ -35,11 +34,6 @@ export default function HomePage() {
   const ella = heroDestination('ella');
   const mirissa = heroDestination('mirissa');
 
-  const onSearch = (e) => {
-    e.preventDefault();
-    navigate(query.trim() ? `/destinations?q=${encodeURIComponent(query.trim())}` : '/destinations');
-  };
-
   return (
     <>
       <section className="hero">
@@ -48,20 +42,11 @@ export default function HomePage() {
             <p className="eyebrow">{t('home.eyebrow')}</p>
             <h1><Trans i18nKey="home.heading" components={{ em: <em /> }} /></h1>
             <p className="lede">{t('home.lede')}</p>
-            <form className="search-bar" role="search" onSubmit={onSearch}>
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={t('home.searchPlaceholder')}
-                aria-label={t('home.searchLabel')}
-              />
-              <button type="submit" className="btn btn-primary">{t('home.search')}</button>
-            </form>
+            <SearchBox />
             <dl className="hero-stats">
               <div><dt>{t('home.stats.est')}</dt><dd>{business ? business.founded : t('common.na')}</dd></div>
-              <div><dt>{t('home.stats.destinations')}</dt><dd>{stats ? stats.destinations : t('common.na')}</dd></div>
-              <div><dt>{t('home.stats.journeys')}</dt><dd>{stats ? stats.packages : t('common.na')}</dd></div>
+              <div><dt>{t('home.stats.destinations')}</dt><dd><Link to="/destinations">{stats ? stats.destinations : t('common.na')}</Link></dd></div>
+              <div><dt>{t('home.stats.journeys')}</dt><dd><Link to="/destinations">{stats ? stats.packages : t('common.na')}</Link></dd></div>
             </dl>
           </div>
           <div className="hero-art" aria-hidden="true">
@@ -85,7 +70,7 @@ export default function HomePage() {
         <header className="section-head">
           <span className="section-num">01</span>
           <div>
-            <h2 className="section-title">{t('home.featured.title')}</h2>
+            <h2 className="section-title"><Link to="/destinations">{t('home.featured.title')}</Link></h2>
             <p className="section-sub">{t('home.featured.subtitle')}</p>
           </div>
           <Link to="/destinations" className="link-arrow">{t('home.featured.all')} <span aria-hidden="true">→</span></Link>

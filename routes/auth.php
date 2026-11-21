@@ -6,8 +6,11 @@ if ($method === 'POST' && $path === '/api/auth/register') {
     $email = isset($b['email']) ? $b['email'] : '';
     $password = isset($b['password']) ? $b['password'] : '';
 
-    if (!text_ok($name, 1, 80) || !text_ok($email, 1, 120) || !is_string($password) || $password === '') {
+    if (!is_string($name) || trim($name) === '' || !is_string($email) || trim($email) === '' || !is_string($password) || $password === '') {
         json_response(['error' => t('error.required_all')], 400);
+    }
+    if (!is_valid_name($name)) {
+        json_response(['error' => t('error.invalid_name', ['min' => rule('nameMin'), 'max' => rule('nameMax')])], 400);
     }
     if (!is_valid_email($email)) {
         json_response(['error' => t('error.invalid_email')], 400);

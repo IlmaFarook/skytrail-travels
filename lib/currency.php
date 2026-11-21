@@ -16,6 +16,8 @@ function save_setting($db, $key, $value) {
 
 // returns ['rates' => [code => rate], 'date' => 'YYYY-MM-DD'] or null
 function fetch_live_rates() {
+    // the http timeout below covers reading only, so cap the connection wait as well
+    ini_set('default_socket_timeout', '4');
     $context = stream_context_create(['http' => ['timeout' => 4, 'header' => "User-Agent: SkyTrailTravels\r\n"]]);
     $raw = @file_get_contents('https://open.er-api.com/v6/latest/LKR', false, $context);
     if ($raw === false) {

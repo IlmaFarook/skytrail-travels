@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-const BASE = process.env.TEST_URL || 'http://localhost:3000';
+const BASE = process.env.TEST_URL || 'http://localhost:3100';
 const stamp = Date.now();
 
 // tiny client that keeps the session cookie between calls
@@ -30,7 +30,7 @@ function futureDate(days = 30) {
 
 const goodBooking = (pkg = 1) => ({
   package_id: pkg, full_name: 'Test Traveller', email: 'traveller@example.com',
-  phone: '0771234567', travel_date: futureDate(), travellers: 2, special_requests: 'Window seat',
+  phone: '+94771234567', travel_date: futureDate(), travellers: 2, special_requests: 'Window seat',
 });
 
 const admin = client();
@@ -121,22 +121,22 @@ test('customer can create and list a booking', async () => {
 });
 
 test('customer can edit a pending booking', async () => {
-  const r = await customer('PATCH', `/api/bookings/${bookingId}`, { phone: '0112345678', travel_date: futureDate(45), travellers: 3, special_requests: 'Vegetarian' });
+  const r = await customer('PATCH', `/api/bookings/${bookingId}`, { phone: '+94112345678', travel_date: futureDate(45), travellers: 3, special_requests: 'Vegetarian' });
   assert.equal(r.status, 200);
   const list = await customer('GET', '/api/bookings/mine');
   const b = list.json.find(x => x.id === bookingId);
   assert.equal(b.travellers, 3);
-  assert.equal(b.phone, '0112345678');
+  assert.equal(b.phone, '+94112345678');
 });
 
 test('edit with a past date is rejected', async () => {
-  const r = await customer('PATCH', `/api/bookings/${bookingId}`, { phone: '0112345678', travel_date: '2020-01-01', travellers: 3 });
+  const r = await customer('PATCH', `/api/bookings/${bookingId}`, { phone: '+94112345678', travel_date: '2020-01-01', travellers: 3 });
   assert.equal(r.status, 400);
 });
 
 test('another customer cannot touch this booking', async () => {
   await other('POST', '/api/auth/register', { name: 'Other', email: otherEmail, password: 'Passw0rdOK' });
-  assert.equal((await other('PATCH', `/api/bookings/${bookingId}`, { phone: '0112345678', travel_date: futureDate(), travellers: 1 })).status, 404);
+  assert.equal((await other('PATCH', `/api/bookings/${bookingId}`, { phone: '+94112345678', travel_date: futureDate(), travellers: 1 })).status, 404);
   assert.equal((await other('POST', `/api/bookings/${bookingId}/cancel`)).status, 404);
 });
 
@@ -145,7 +145,7 @@ test('customer can cancel, and only once', async () => {
   const list = await customer('GET', '/api/bookings/mine');
   assert.equal(list.json.find(x => x.id === bookingId).status, 'Cancelled');
   assert.equal((await customer('POST', `/api/bookings/${bookingId}/cancel`)).status, 409);
-  assert.equal((await customer('PATCH', `/api/bookings/${bookingId}`, { phone: '0112345678', travel_date: futureDate(), travellers: 1 })).status, 409);
+  assert.equal((await customer('PATCH', `/api/bookings/${bookingId}`, { phone: '+94112345678', travel_date: futureDate(), travellers: 1 })).status, 409);
 });
 
 // ---------- public data ----------
@@ -320,8 +320,11 @@ test('the rules the React app uses come from the API', async () => {
   assert.equal(cfg.compareMax, 3);
   assert.equal(cfg.passwordMinLength, 8);
   assert.match(cfg.minTravelDate, /^\d{4}-\d{2}-\d{2}$/);
-  assert.ok(new RegExp(cfg.phonePattern).test('0771234567') && !new RegExp(cfg.phonePattern).test('abc'));
-  assert.ok(new RegExp(cfg.emailPattern).test('a@b.co') && !new RegExp(cfg.emailPattern).test('nope'));
+  assert.ok(new RegExp(cfg.phonePattern).test('+94771234567'));
+  assert.ok(!new RegExp(cfg.phonePattern).test('0771234567') && !new RegExp(cfg.phonePattern).test('abc'));
+  assert.ok(new RegExp(cfg.namePattern, 'u').test('José O\'Neil-Smith Jr.') && !new RegExp(cfg.namePattern, 'u').test('Ilma 123'));
+  assert.equal(cfg.defaultPhoneCountry, 'LK');
+  assert.match(cfg.maxTravelDate, /^\d{4}-\d{2}-\d{2}$/);
 });
 
 test('the server enforces the same rules it publishes', async () => {
@@ -514,6 +517,111 @@ test('contact form saves a message the admin can read', async () => {
   assert.equal(ok.status, 201);
   const msgs = (await admin('GET', '/api/admin/messages')).json;
   assert.ok(msgs.some(m => m.message.includes(String(stamp))));
+});
+
+// ---------- booking references ----------
+test('every booking gets a unique reference that its owner and the admin can see', async () => {
+  const first = await customer('POST', '/api/bookings', goodBooking());
+  const second = await customer('POST', '/api/bookings', goodBooking(2));
+  assert.equal(first.status, 201);
+  assert.match(first.json.reference, /^ST\d{4}-[A-HJ-NP-Z2-9]{6}$/);
+  assert.notEqual(first.json.reference, second.json.reference);
+
+  const found = await customer('GET', `/api/bookings/reference/${first.json.reference}`);
+  assert.equal(found.status, 200);
+  assert.equal(found.json.reference, first.json.reference);
+  assert.ok(found.json.package_title && found.json.destination_name && found.json.total_converted > 0);
+  const lower = await customer('GET', `/api/bookings/reference/${first.json.reference.toLowerCase()}`);
+  assert.equal(lower.status, 200);
+
+  assert.equal((await other('GET', `/api/bookings/reference/${first.json.reference}`)).status, 404, 'someone else cannot open it');
+  assert.equal((await client()('GET', `/api/bookings/reference/${first.json.reference}`)).status, 401);
+  assert.equal((await customer('GET', '/api/bookings/reference/ST0000-AAAAAA')).status, 404);
+
+  const mine = await customer('GET', '/api/bookings/mine');
+  assert.ok(mine.json.every(b => /^ST\d{4}-/.test(b.reference)));
+  assert.ok(mine.json.some(b => b.reference === first.json.reference));
+  const all = await admin('GET', '/api/admin/bookings');
+  assert.ok(all.json.some(b => b.reference === first.json.reference));
+  assert.equal(new Set(all.json.map(b => b.reference)).size, all.json.length, 'references are unique');
+});
+
+// ---------- form fields: names, emails, phones, dates, messages ----------
+test('names accept letters in any language and refuse digits and symbols', async () => {
+  const guest = client();
+  const post = (name) => guest('POST', '/api/auth/register', { name, email: `name${Math.random().toString(36).slice(2)}@example.com`, password: 'Passw0rdOK' });
+  assert.equal((await post('Ilma 123')).status, 400);
+  assert.equal((await post('<b>Ilma</b>')).status, 400);
+  assert.equal((await post('A')).status, 400);
+  assert.equal((await post('x'.repeat(61))).status, 400);
+  const bad = await post('Ilma 123');
+  assert.match(bad.json.error, /letters, spaces/);
+  assert.equal((await post("José María O'Neil-Smith Jr.")).status, 201);
+});
+
+test('emails are checked with the standard filter', async () => {
+  const guest = client();
+  for (const email of ['nope', 'a@b', 'me@localhost', 'a b@c.com', 'a@@b.com']) {
+    const r = await guest('POST', '/api/contact', { name: 'Test Visitor', email, message: 'Hello' });
+    assert.equal(r.status, 400, email);
+  }
+  const ok = await guest('POST', '/api/contact', { name: 'Test Visitor', email: 'visitor@example.co.uk', message: 'Hello' });
+  assert.equal(ok.status, 201);
+});
+
+test('phone numbers must be in international form', async () => {
+  for (const phone of ['0771234567', '+0771234567', '+94', 'abc', '+94 77 12']) {
+    const r = await customer('POST', '/api/bookings', { ...goodBooking(), phone });
+    assert.equal(r.status, 400, phone);
+  }
+  const spaced = await customer('POST', '/api/bookings', { ...goodBooking(), phone: '+94 77 123 4567' });
+  assert.equal(spaced.status, 201);
+});
+
+test('travel dates are limited at both ends and messages have a length limit', async () => {
+  const cfg = (await client()('GET', '/api/config')).json;
+  const last = await customer('POST', '/api/bookings', { ...goodBooking(), travel_date: cfg.maxTravelDate });
+  assert.equal(last.status, 201);
+  const dayAfter = new Date(Date.parse(cfg.maxTravelDate) + 86400000).toISOString().slice(0, 10);
+  const tooFar = await customer('POST', '/api/bookings', { ...goodBooking(), travel_date: dayAfter });
+  assert.equal(tooFar.status, 400);
+  assert.match(tooFar.json.error, /on or before/);
+  const long = await client()('POST', '/api/contact', { name: 'Test Visitor', email: 'visitor@example.com', message: 'x'.repeat(cfg.messageMax + 1) });
+  assert.equal(long.status, 400);
+  assert.match(long.json.error, new RegExp(String(cfg.messageMax)));
+});
+
+// ---------- search suggestions ----------
+test('suggest: matches destinations and packages, and always sends the popular destinations', async () => {
+  const guest = client();
+  const r = await guest('GET', '/api/suggest?q=mir');
+  assert.equal(r.status, 200);
+  const types = r.json.matches.map(m => m.type);
+  assert.ok(types.includes('destination') && types.includes('package'));
+  assert.equal(r.json.matches[0].title, 'Mirissa');
+  assert.ok(r.json.matches.length <= 6);
+  assert.match(r.json.matches[0].subtitle, /Sri Lanka · \d+ journeys?/);
+  assert.ok(r.json.popular.length > 0 && r.json.popular.length <= 5);
+  assert.ok(r.json.popular.every(p => p.id && p.title && p.subtitle));
+});
+
+test('suggest: text that is too short gives no matches, wildcards are matched literally', async () => {
+  const guest = client();
+  const short = await guest('GET', '/api/suggest?q=m');
+  assert.deepEqual(short.json.matches, []);
+  assert.ok(short.json.popular.length > 0);
+  const wild = await guest('GET', '/api/suggest?q=' + encodeURIComponent('%%'));
+  assert.deepEqual(wild.json.matches, []);
+  const none = await guest('GET', '/api/suggest?q=zzzzqq');
+  assert.deepEqual(none.json.matches, []);
+});
+
+test('suggest: popular destinations follow the bookings made', async () => {
+  const guest = client();
+  const before = (await guest('GET', '/api/suggest')).json.popular;
+  assert.equal(new Set(before.map(p => p.id)).size, before.length);
+  const limit = (await guest('GET', '/api/config')).json.popularMax;
+  assert.equal(before.length, limit);
 });
 
 // ---------- logout ----------

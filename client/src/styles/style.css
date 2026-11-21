@@ -238,7 +238,7 @@ nav.main-nav a.btn::after { display: none; }
 .btn-sm { padding: .55rem 1.1rem; font-size: .76rem; }
 
 /* ---------- Hero ---------- */
-.hero { padding: 3.5rem 0 4.5rem; overflow: hidden; }
+.hero { padding: 3.5rem 0 4.5rem; overflow-x: clip; } /* sideways only, so the search suggestions can reach below the hero */
 .hero-grid {
   display: grid;
   grid-template-columns: 1.15fr .85fr;
@@ -820,3 +820,101 @@ main { min-height: calc(100vh - 80px); }
 .form-note { text-align: center; font-size: 0.78rem; color: var(--muted); }
 .section-top { padding-top: 2.5rem; }
 .btn-stacked { margin-top: 0.6rem; }
+
+/* search suggestions */
+.search-box { position: relative; z-index: 5; max-width: 34rem; } /* above the stats row below it */
+.suggest-panel {
+  position: absolute; left: 0; top: calc(100% + .6rem); z-index: 30;
+  width: min(42rem, calc(100vw - 2rem));
+  display: grid; grid-template-columns: 1.5fr 1fr;
+  background: var(--paper-3); border: 1.5px solid var(--ink); border-radius: 1.2rem;
+  box-shadow: 6px 6px 0 var(--ink); overflow: hidden;
+}
+.suggest-main, .suggest-popular { padding: 1rem 1.1rem 1.1rem; }
+.suggest-popular { background: var(--paper-2); border-left: 1.5px solid var(--ink); }
+.suggest-head { margin: 0 0 .5rem; font-size: .68rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.suggest-main ul, .suggest-popular ul { list-style: none; margin: 0; padding: 0; }
+.suggest-option, .suggest-popular a { display: block; padding: .5rem .6rem; border-radius: .6rem; cursor: pointer; color: var(--ink); text-decoration: none; }
+.suggest-option:hover, .suggest-option.is-active, .suggest-popular a:hover, .suggest-popular a:focus-visible { background: var(--paper-3); outline: none; }
+.suggest-popular a:hover, .suggest-popular a:focus-visible { background: var(--white); }
+.suggest-option.is-active { background: var(--paper-2); box-shadow: inset 3px 0 0 var(--navy); }
+.suggest-title { display: block; font-weight: 600; }
+.suggest-title mark { background: none; color: var(--navy); }
+.suggest-sub { display: block; font-size: .82rem; color: var(--muted); }
+.suggest-note { margin: .2rem .6rem; font-size: .88rem; color: var(--muted); }
+@media (max-width: 640px) {
+  .suggest-panel { grid-template-columns: 1fr; }
+  .suggest-popular { border-left: none; border-top: 1.5px solid var(--ink); }
+}
+
+/* the whole package card opens the package; the compare box stays clickable */
+.card:not(.post) { position: relative; }
+.card:not(.post) h3 a::after { content: ""; position: absolute; inset: 0; }
+.card:not(.post) .compare-toggle { position: relative; z-index: 1; }
+.card:not(.post) { cursor: pointer; }
+.section-title a, .hero-stats dd a { color: inherit; text-decoration: none; }
+.section-title a:hover, .hero-stats dd a:hover { color: var(--terracotta); }
+
+/* phone number: country picker and number in one box */
+.phone-input { display: flex; align-items: stretch; border: 1.5px solid var(--ink); background: var(--white); }
+.phone-input:focus-within { box-shadow: 4px 4px 0 var(--terracotta); }
+.phone-input.is-invalid { border-color: var(--red); background: var(--bad-bg-soft); }
+.form-group .phone-country {
+  position: relative; display: flex; align-items: center; gap: .45rem; margin: 0; padding: 0 .9rem;
+  border-right: 1.5px solid var(--ink); font-size: 1rem; font-weight: 500; letter-spacing: 0;
+  text-transform: none; color: var(--ink); white-space: nowrap; cursor: pointer;
+}
+.phone-country::after { content: ""; border: .3rem solid transparent; border-top-color: var(--ink); border-bottom: 0; }
+.form-group .phone-country select {
+  position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0;
+  opacity: 0; cursor: pointer; background-image: none;
+}
+.form-group .phone-input input { flex: 1; min-width: 0; border: 0; background: transparent; }
+.form-group .phone-input input:focus { box-shadow: none; }
+
+/* date picker: a button that opens a calendar */
+.date-field { position: relative; }
+.date-button {
+  display: flex; width: 100%; align-items: center; justify-content: space-between; gap: .6rem;
+  padding: .75rem .9rem; border: 1.5px solid var(--ink); border-radius: 0; background: var(--white);
+  font: inherit; font-size: 1rem; color: var(--ink); text-align: left; cursor: pointer;
+}
+.date-button.is-empty span { color: var(--muted); }
+.date-button:focus-visible { outline: none; box-shadow: 4px 4px 0 var(--terracotta); }
+.date-button.is-invalid { border-color: var(--red); background: var(--bad-bg-soft); }
+.date-popover {
+  position: absolute; z-index: 40; top: calc(100% + .5rem); left: 0; max-width: calc(100vw - 2rem);
+  padding: .8rem; background: var(--paper-3); border: 1.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink);
+  font-family: var(--body);
+  --rdp-accent-color: var(--navy);
+  --rdp-accent-background-color: var(--paper-2);
+  --rdp-today-color: var(--terracotta-dark);
+}
+
+/* message length counter */
+.char-count { margin-top: .3rem; text-align: right; font-size: .78rem; color: var(--muted); }
+.char-count.is-near { color: var(--red); font-weight: 600; }
+
+/* booking confirmation */
+.confirm-card { max-width: 46rem; margin: 0 auto; padding: 2rem; background: var(--paper-3); border: 1.5px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); }
+.confirm-ref { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 1.1rem 1.3rem; background: var(--paper-2); border: 1.5px dashed var(--navy); }
+.confirm-label { display: block; font-size: .68rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.confirm-ref strong { font-family: var(--display); font-size: 2rem; letter-spacing: .04em; color: var(--navy); }
+.confirm-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1.1rem 1.6rem; margin: 1.6rem 0 1rem; }
+.confirm-details dt { font-size: .68rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: .2rem; }
+.confirm-details dd { margin: 0; font-weight: 500; }
+.confirm-steps { padding-left: 1.2rem; margin: 0 0 1.6rem; }
+.confirm-steps li { margin-bottom: .6rem; }
+.confirm-actions { display: flex; gap: .8rem; flex-wrap: wrap; }
+.booking-ref { font-family: var(--display); font-weight: 600; white-space: nowrap; color: var(--navy); }
+.field-inline input[type="search"] { padding: .45rem .8rem; border: 1.5px solid var(--ink); background: var(--white); font: inherit; min-width: 14rem; }
+
+/* the admin area is wider and its tables are tighter, so every column fits */
+.container-wide { max-width: 1400px; }
+.manage table.data-table th, .manage table.data-table td { padding: .7rem .75rem; }
+.manage table.data-table th { letter-spacing: .1em; }
+@media (max-width: 1250px) {
+  .manage table.data-table th, .manage table.data-table td { padding: .6rem .5rem; font-size: .85rem; }
+  .manage table.data-table th { white-space: normal; letter-spacing: .06em; font-size: .62rem; }
+  .manage table.data-table select { max-width: 8rem; }
+}

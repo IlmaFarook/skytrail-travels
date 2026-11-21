@@ -1,17 +1,19 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useRules } from '../context/SiteContext';
 import usePageMeta from '../hooks/usePageMeta';
+import { cleanName, emailAttrs } from '../lib/forms';
+import { safePath, homeFor } from '../lib/access';
 
 
 export default function RegisterPage() {
   const { t } = useTranslation();
   usePageMeta(t('meta.register.title'), t('meta.register.description'));
-  const { register } = useAuth();
-  const { config, emailOk, passwordOk } = useRules();
-  const navigate = useNavigate();
+  const { user, register } = useAuth();
+  const { config, emailOk, nameOk, passwordOk } = useRules();
+  const { state } = useLocation();
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
@@ -22,7 +24,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setAlert(null);
     const errs = {};
-    if (!form.name.trim()) errs.name = true;
+    if (!nameOk(form.name)) errs.name = true;
     if (!emailOk(form.email.trim())) errs.email = true;
     if (!passwordOk(form.password)) errs.password = true;
     if (form.password !== form.confirm || !form.confirm) errs.confirm = true;
@@ -31,11 +33,12 @@ export default function RegisterPage() {
 
     try {
       await register(form.name.trim(), form.email.trim(), form.password);
-      navigate('/');
     } catch (err) {
       setAlert(err.message || t('auth.register.failed'));
     }
   };
+
+  if (user) return <Navigate to={safePath(state?.from) || homeFor(user)} replace />;
 
   return (
     <>
@@ -45,12 +48,14 @@ export default function RegisterPage() {
         <form className="form-card" onSubmit={onSubmit} noValidate>
           <div className={`form-group${errors.name ? ' has-error' : ''}`}>
             <label htmlFor="name">{t('auth.register.name')}</label>
-            <input id="name" value={form.name} onChange={update('name')} />
-            <div className="error-text">{t('validation.fullName')}</div>
+            <input id="name" value={form.name} maxLength={config?.nameMax} autoComplete="name"
+              onChange={(e) => setForm(f => ({ ...f, name: cleanName(e.target.value, config) }))} />
+            <div className="error-text">{t('validation.fullName', { max: config?.nameMax ?? '' })}</div>
           </div>
           <div className={`form-group${errors.email ? ' has-error' : ''}`}>
             <label htmlFor="email">{t('auth.register.email')}</label>
-            <input id="email" type="email" value={form.email} onChange={update('email')} />
+            <input id="email" {...emailAttrs} value={form.email} onChange={update('email')}
+              onBlur={() => setForm(f => ({ ...f, email: f.email.trim().toLowerCase() }))} />
             <div className="error-text">{t('validation.email')}</div>
           </div>
           <div className={`form-group${errors.password ? ' has-error' : ''}`}>

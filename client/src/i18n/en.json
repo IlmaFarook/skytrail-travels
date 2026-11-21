@@ -46,6 +46,24 @@
     "instagram": "Instagram",
     "tiktok": "TikTok"
   },
+  "search": {
+    "matches": "Matches",
+    "popular": "Popular destinations",
+    "hint": "Type at least {{min}} letters to see matches.",
+    "none": "Nothing matches that yet. Press Search to look through all journeys.",
+    "count_one": "1 suggestion",
+    "count_other": "{{count}} suggestions"
+  },
+  "form": {
+    "chars": "{{used}} / {{max}} characters",
+    "phoneCountry": "Country code",
+    "pickDate": "Choose a date"
+  },
+  "pageError": {
+    "heading": "This page did not load",
+    "text": "Something went wrong while opening this page. Reloading usually fixes it.",
+    "reload": "Reload the page"
+  },
   "common": {
     "na": "n/a",
     "loading": "Loading…",
@@ -75,16 +93,16 @@
   "validation": {
     "fixHighlighted": "Please fix the highlighted fields.",
     "fixBeforeSubmit": "Please fix the highlighted fields before submitting.",
-    "fullName": "Please enter your full name.",
-    "name": "Please enter your name.",
+    "fullName": "Please enter your full name, using letters only (2 to {{max}} characters).",
+    "name": "Please enter your name, using letters only (2 to {{max}} characters).",
     "email": "Please enter a valid email address.",
-    "phone": "Please enter a valid phone number.",
+    "phone": "Please enter a valid phone number for the selected country.",
     "password": "Please enter your password.",
     "passwordStrength": "Use at least {{min}} characters, including a letter and a number.",
     "passwordMatch": "Passwords do not match.",
     "message": "Please enter a message.",
-    "travelDateFuture": "Please select a future travel date.",
-    "travelDateChoose": "Please choose a future date.",
+    "travelDateFuture": "Please choose a travel date from tomorrow, up to two years ahead.",
+    "travelDateChoose": "Please choose a travel date from tomorrow, up to two years ahead.",
     "travellers": "Please enter between 1 and {{max}} travellers.",
     "travellersShort": "Enter between 1 and {{max}} travellers."
   },
@@ -130,7 +148,7 @@
     },
     "about": {
       "title": "About & Contact",
-      "description": "About SkyTrail Travels, a Kandy travel agency since 2015: contact details, location map and FAQs."
+      "description": "About SkyTrail Travels, a Kandy travel agency since 2020: contact details, location map and FAQs."
     },
     "compare": {
       "title": "Compare Packages",
@@ -146,6 +164,10 @@
     "credits": {
       "title": "Photo Credits",
       "description": "Who took the photographs on the SkyTrail Travels website, their licences, and the other sources we use."
+    },
+    "bookingConfirmation": {
+      "title": "Enquiry received | SkyTrail Travels",
+      "description": "Your SkyTrail booking enquiry and its reference number."
     }
   },
   "home": {
@@ -160,7 +182,7 @@
       "destinations": "Destinations",
       "journeys": "Curated journeys"
     },
-    "stamp": "KANDY · SRI LANKA · SINCE 2015 · ",
+    "stamp": "KANDY · SRI LANKA · SINCE 2020 · ",
     "featured": {
       "title": "Featured journeys",
       "subtitle": "Our most loved, hand-picked holiday experiences.",
@@ -236,7 +258,6 @@
     "login": "Login",
     "createAccount": "Create an account",
     "noPackageSelected": "No package selected. Please choose a package first.",
-    "success": "Thank you! Your booking enquiry has been submitted. Our team will contact you shortly.",
     "submitFailed": "Could not submit your enquiry.",
     "fullName": "Full Name *",
     "email": "Email Address *",
@@ -244,7 +265,6 @@
     "travelDate": "Preferred Travel Date *",
     "travellers": "Number of Travellers *",
     "requests": "Special Requests",
-    "phonePlaceholder": "e.g. 0771234567",
     "requestsPlaceholder": "Dietary requirements, accessibility needs, celebration occasions, etc.",
     "submit": "Submit Enquiry"
   },
@@ -283,7 +303,8 @@
       "travellers": "Travellers",
       "price": "Price",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "reference": "Reference"
     },
     "empty": "You have no bookings yet.",
     "updated": "Your booking was updated.",
@@ -328,7 +349,6 @@
   },
   "admin": {
     "notAllowed": "Administrator access required. Please log in with an admin account.",
-    "login": "Login",
     "eyebrow": "Staff area",
     "heading": "Admin Dashboard",
     "intro": "Manage bookings, packages, customers and website content.",
@@ -354,17 +374,18 @@
       "show": "Show",
       "allStatuses": "All statuses",
       "headers": {
-        "customer": "Customer",
-        "package": "Package",
-        "destination": "Destination",
+        "customer": "Customer and contact",
+        "package": "Package and destination",
         "travelDate": "Travel Date",
         "travellers": "Travellers",
-        "contact": "Contact",
         "status": "Status",
-        "update": "Update"
+        "update": "Update",
+        "reference": "Reference"
       },
       "none": "No booking enquiries to show.",
-      "statusFor": "Status for booking {{id}}"
+      "statusFor": "Status for booking {{id}}",
+      "search": "Find",
+      "searchPlaceholder": "Reference, name or email"
     },
     "manage": {
       "addTitle": "Add {{noun}}",
@@ -567,7 +588,7 @@
   "about": {
     "eyebrow": "About",
     "heading": "About SkyTrail Travels",
-    "intro": "Your trusted travel partner since 2015.",
+    "intro": "Your trusted travel partner since 2020.",
     "storyTitle": "Our Story",
     "story": "SkyTrail Travels is a growing Sri Lankan travel and tourism agency offering local and international holiday packages, adventure tours, corporate travel arrangements, honeymoon packages, hotel reservations and customised travel experiences. We've helped thousands of travellers explore Sri Lanka's hill country, beaches and wildlife, along with international escapes across Asia and the Indian Ocean.",
     "missionTitle": "Our Mission",
@@ -664,5 +685,34 @@
     "unescoGalle": "UNESCO World Heritage Centre: Old Town of Galle and its Fortifications",
     "burj": "Burj Khalifa: Facts and figures",
     "ratesLink": "exchangerate-api.com"
+  },
+  "confirmation": {
+    "eyebrow": "Enquiry received",
+    "heading": "Thank you, your enquiry is in",
+    "intro": "Hello {{name}}, we have your booking enquiry. Keep the reference below.",
+    "reference": "Your reference",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copiedNote": "Reference copied.",
+    "keep": "Keep this reference and quote it when you call or write to us.",
+    "details": {
+      "package": "Package",
+      "destination": "Destination",
+      "travelDate": "Travel date",
+      "travellers": "Travellers",
+      "total": "Estimated total",
+      "contact": "Contact details",
+      "status": "Status"
+    },
+    "nextTitle": "What happens next",
+    "steps": {
+      "review": "Our team checks your dates and the package.",
+      "contact": "A consultant contacts you on the phone number or email you gave, to confirm the details and the final price.",
+      "status": "The status above changes from Pending to Confirmed. You can edit or cancel while it is Pending."
+    },
+    "viewBookings": "View my bookings",
+    "browseMore": "Browse more journeys",
+    "notFoundHeading": "We could not find that enquiry",
+    "notFoundText": "Check the reference, or open My bookings to see all of yours."
   }
 }

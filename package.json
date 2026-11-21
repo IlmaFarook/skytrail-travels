@@ -5,9 +5,13 @@
   "private": true,
   "scripts": {
     "build": "npm --prefix client install && npm --prefix client run build",
-    "start": "php -S localhost:3000 -t public router.php",
-    "test": "node --test tests/api.test.mjs",
-    "test:e2e": "node --test tests/e2e.test.mjs",
+    "start": "node bin/start.mjs",
+    "dev": "node bin/dev.mjs",
+    "backup": "node bin/backup.mjs",
+    "db:reset": "node bin/reset-db.mjs",
+    "test": "node tests/with-server.mjs node --test tests/api.test.mjs",
+    "test:e2e": "node tests/with-server.mjs node --test tests/e2e.test.mjs",
+    "test:db": "node --test tests/db.test.mjs",
     "test:i18n": "node --test tests/i18n.test.mjs"
   },
   "devDependencies": {

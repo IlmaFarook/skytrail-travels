@@ -5,6 +5,7 @@ node_modules/
 db/*.db
 db/*.db-shm
 db/*.db-wal
+db/backups/
 
 # system files and logs
 .DS_Store

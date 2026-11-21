@@ -16,14 +16,25 @@ function json_response($data, $status = 200) {
 }
 
 function is_valid_email($email) {
-    if (strlen($email) > 120) {
+    if (!is_string($email) || strlen($email) > rule('emailMax')) {
         return false;
     }
-    return preg_match('#' . rule('emailPattern') . '#', $email) === 1;
+    // PHP's own check, plus a dot in the domain (it lets "me@localhost" through)
+    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false && strpos(substr($email, strrpos($email, '@')), '.') !== false;
 }
 
+// spaces, dots, dashes and brackets are ignored: "+94 77 165 4746" is fine
 function is_valid_phone($phone) {
-    return preg_match('#' . rule('phonePattern') . '#', $phone) === 1;
+    if (!is_string($phone)) {
+        return false;
+    }
+    return preg_match('#' . rule('phonePattern') . '#', preg_replace('/[\s().-]/', '', $phone)) === 1;
+}
+
+// letters (any language), spaces, dots, apostrophes and hyphens only
+function is_valid_name($name) {
+    return text_ok($name, rule('nameMin'), rule('nameMax'))
+        && preg_match('#' . rule('namePattern') . '#u', trim($name)) === 1;
 }
 
 // long enough, with a letter and a number
@@ -69,6 +80,11 @@ function csp_header() {
         . "style-src 'self'; font-src 'self'; "
         . "img-src 'self' data:; frame-src https://www.openstreetmap.org; connect-src 'self'; "
         . "base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
+}
+
+// Escapes % and _ so a visitor's text is matched literally in a LIKE (use with ESCAPE '\\').
+function like_pattern($text) {
+    return '%' . addcslashes($text, '%_\\') . '%';
 }
 
 // Turns the photo columns of a destination (or of the destination joined to a

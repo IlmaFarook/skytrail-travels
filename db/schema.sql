@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS bookings (
   travel_date TEXT NOT NULL,
   travellers INTEGER NOT NULL,
   special_requests TEXT,
+  reference TEXT,
   status TEXT NOT NULL DEFAULT 'Pending',
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );

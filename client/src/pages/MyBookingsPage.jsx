@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { LoginRedirect } from '../lib/access';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import { useCurrency } from '../context/CurrencyContext';
@@ -7,11 +8,15 @@ import CurrencyNote from '../components/CurrencyNote';
 import { useAuth } from '../context/AuthContext';
 import { useRules } from '../context/SiteContext';
 import usePageMeta from '../hooks/usePageMeta';
+import PhoneInput from '../components/PhoneInput';
+import DateField from '../components/DateField';
+import LimitedTextarea from '../components/LimitedTextarea';
+import { phoneValid } from '../lib/phone';
 
 export default function MyBookingsPage() {
   const { t } = useTranslation();
   const { money, currency } = useCurrency();
-  const { config, phoneOk, travellersOk, dateOk } = useRules();
+  const { config, travellersOk, dateOk } = useRules();
   usePageMeta(t('meta.myBookings.title'), t('meta.myBookings.description'));
   const { user, loading } = useAuth();
   const [bookings, setBookings] = useState(null);
@@ -27,7 +32,8 @@ export default function MyBookingsPage() {
   }, [user, currency]);
 
   if (loading) return <p className="container">{t('common.loading')}</p>;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <LoginRedirect />;
+  if (user.role === 'admin') return <Navigate to="/admin" replace />; // admins manage everyone's bookings there
 
   const startEdit = (b) => {
     setAlert(null);
@@ -47,7 +53,7 @@ export default function MyBookingsPage() {
     e.preventDefault();
     setAlert(null);
     const errs = {};
-    if (!phoneOk(form.phone.trim())) errs.phone = true;
+    if (!phoneValid(form.phone)) errs.phone = true;
     if (!dateOk(form.travel_date)) errs.travel_date = true;
     const n = Number(form.travellers);
     if (!travellersOk(n)) errs.travellers = true;
@@ -87,6 +93,7 @@ export default function MyBookingsPage() {
           <table className="data-table">
             <thead>
               <tr>
+                <th>{t('myBookings.headers.reference')}</th>
                 <th>{t('myBookings.headers.package')}</th>
                 <th>{t('myBookings.headers.travelDate')}</th>
                 <th>{t('myBookings.headers.travellers')}</th>
@@ -96,12 +103,13 @@ export default function MyBookingsPage() {
               </tr>
             </thead>
             <tbody>
-              {bookings === null && <tr><td colSpan={6}>{t('common.loading')}</td></tr>}
+              {bookings === null && <tr><td colSpan={7}>{t('common.loading')}</td></tr>}
               {bookings?.length === 0 && (
-                <tr><td colSpan={6}>{t('myBookings.empty')} <Link to="/destinations">{t('common.browsePackages')}</Link>.</td></tr>
+                <tr><td colSpan={7}>{t('myBookings.empty')} <Link to="/destinations">{t('common.browsePackages')}</Link>.</td></tr>
               )}
               {bookings?.map(b => (
                 <tr key={b.id}>
+                  <td className="booking-ref">{b.reference}</td>
                   <td>{b.package_title}</td>
                   <td>{b.travel_date}</td>
                   <td>{b.travellers}</td>
@@ -125,12 +133,14 @@ export default function MyBookingsPage() {
             <h2>{t('myBookings.editTitle', { title: editing.package_title })}</h2>
             <div className={`form-group${errors.phone ? ' has-error' : ''}`}>
               <label htmlFor="e-phone">{t('myBookings.phone')}</label>
-              <input id="e-phone" type="tel" value={form.phone} onChange={update('phone')} />
+              <PhoneInput id="e-phone" value={form.phone} invalid={errors.phone}
+                onChange={(phone) => setForm(f => ({ ...f, phone }))} />
               <div className="error-text">{t('validation.phone')}</div>
             </div>
             <div className={`form-group${errors.travel_date ? ' has-error' : ''}`}>
               <label htmlFor="e-date">{t('myBookings.date')}</label>
-              <input id="e-date" type="date" min={config?.minTravelDate} value={form.travel_date} onChange={update('travel_date')} />
+              <DateField id="e-date" value={form.travel_date} min={config?.minTravelDate} max={config?.maxTravelDate}
+                invalid={errors.travel_date} onChange={(travel_date) => setForm(f => ({ ...f, travel_date }))} />
               <div className="error-text">{t('validation.travelDateChoose')}</div>
             </div>
             <div className={`form-group${errors.travellers ? ' has-error' : ''}`}>
@@ -140,7 +150,7 @@ export default function MyBookingsPage() {
             </div>
             <div className="form-group">
               <label htmlFor="e-requests">{t('myBookings.requests')}</label>
-              <textarea id="e-requests" maxLength={config?.specialRequestsMax} value={form.special_requests} onChange={update('special_requests')} />
+              <LimitedTextarea id="e-requests" max={config?.specialRequestsMax} value={form.special_requests} onChange={update('special_requests')} />
             </div>
             <div className="form-buttons">
               <button type="submit" className="btn btn-primary">{t('myBookings.saveChanges')}</button>

@@ -27,6 +27,66 @@ if ($method === 'GET' && $path === '/api/site') {
     ]);
 }
 
+// search suggestions: matches for what the visitor typed, plus the most popular destinations
+if ($method === 'GET' && $path === '/api/suggest') {
+    $text = trim(mb_substr(isset($_GET['q']) ? (string) $_GET['q'] : '', 0, 60));
+    $matches = [];
+
+    if (mb_strlen($text) >= rule('suggestMinChars')) {
+        $like = like_pattern($text);
+        $start = addcslashes($text, '%_\\') . '%';
+        $limit = rule('suggestMax');
+
+        $stmt = $db->prepare("SELECT d.id, d.name, d.country, COUNT(p.id) AS journeys
+            FROM destinations d LEFT JOIN packages p ON p.destination_id = d.id
+            WHERE d.name LIKE :like ESCAPE '\\' OR d.country LIKE :like ESCAPE '\\' OR d.region LIKE :like ESCAPE '\\'
+            GROUP BY d.id ORDER BY d.name LIKE :start ESCAPE '\\' DESC, d.name LIMIT $limit");
+        $stmt->execute(['like' => $like, 'start' => $start]);
+        foreach ($stmt->fetchAll() as $row) {
+            $matches[] = [
+                'type' => 'destination',
+                'id' => (int) $row['id'],
+                'title' => $row['name'],
+                'subtitle' => t('suggest.destination', ['country' => $row['country'], 'count' => $row['journeys']]),
+            ];
+        }
+
+        $stmt = $db->prepare("SELECT p.id, p.title, p.duration_days, d.name AS destination, d.country
+            FROM packages p JOIN destinations d ON p.destination_id = d.id
+            WHERE p.title LIKE :like ESCAPE '\\' OR p.category LIKE :like ESCAPE '\\'
+            ORDER BY p.title LIKE :start ESCAPE '\\' DESC, p.title LIMIT $limit");
+        $stmt->execute(['like' => $like, 'start' => $start]);
+        foreach ($stmt->fetchAll() as $row) {
+            $matches[] = [
+                'type' => 'package',
+                'id' => (int) $row['id'],
+                'title' => $row['title'],
+                'subtitle' => t('suggest.package', [
+                    'place' => $row['destination'] . ', ' . $row['country'],
+                    'length' => t('page.days', ['count' => $row['duration_days'], 'days' => $row['duration_days']]),
+                ]),
+            ];
+        }
+        $matches = array_slice($matches, 0, $limit);
+    }
+
+    // popular = most bookings (cancelled ones do not count), then most journeys
+    $stmt = $db->query("SELECT d.id, d.name, d.country, COUNT(DISTINCT p.id) AS journeys, COUNT(DISTINCT b.id) AS bookings
+        FROM destinations d JOIN packages p ON p.destination_id = d.id
+        LEFT JOIN bookings b ON b.package_id = p.id AND b.status != 'Cancelled'
+        GROUP BY d.id ORDER BY bookings DESC, journeys DESC, d.name LIMIT " . (int) rule('popularMax'));
+    $popular = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $popular[] = [
+            'id' => (int) $row['id'],
+            'title' => $row['name'],
+            'subtitle' => t('suggest.destination', ['country' => $row['country'], 'count' => $row['journeys']]),
+        ];
+    }
+
+    json_response(['matches' => $matches, 'popular' => $popular]);
+}
+
 if ($method === 'GET' && $path === '/api/destinations') {
     $rows = $db->query('SELECT * FROM destinations ORDER BY name')->fetchAll();
     foreach ($rows as &$row) {
@@ -181,8 +241,14 @@ if ($method === 'POST' && $path === '/api/contact') {
     $email = isset($b['email']) ? $b['email'] : '';
     $message = isset($b['message']) ? $b['message'] : '';
 
-    if (!text_ok($name, 1, 80) || !text_ok($email, 1, 120) || !text_ok($message, 1, 1000)) {
+    if (!is_string($name) || trim($name) === '' || !is_string($email) || trim($email) === '' || !is_string($message) || trim($message) === '') {
         json_response(['error' => t('error.required_all')], 400);
+    }
+    if (!is_valid_name($name)) {
+        json_response(['error' => t('error.invalid_name', ['min' => rule('nameMin'), 'max' => rule('nameMax')])], 400);
+    }
+    if (!text_ok($message, 1, rule('messageMax'))) {
+        json_response(['error' => t('contact.too_long', ['max' => rule('messageMax')])], 400);
     }
     if (!is_valid_email($email)) {
         json_response(['error' => t('error.invalid_email')], 400);

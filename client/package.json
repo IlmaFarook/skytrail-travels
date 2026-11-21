@@ -11,10 +11,13 @@
   },
   "dependencies": {
     "i18next": "^27.2.2",
+    "libphonenumber-js": "^1.13.17",
     "react": "^19.2.8",
+    "react-day-picker": "^10.0.2",
     "react-dom": "^19.2.8",
     "react-i18next": "^18.0.3",
-    "react-router-dom": "^7.18.4"
+    "react-router-dom": "^7.18.4",
+    "validator": "^13.15.35"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",

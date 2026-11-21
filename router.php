@@ -4,12 +4,13 @@ date_default_timezone_set('Asia/Colombo');
 
 require __DIR__ . '/db.php';
 require __DIR__ . '/lib/lang.php';
-require __DIR__ . '/lib/rules.php';
+require_once __DIR__ . '/lib/rules.php';
 require __DIR__ . '/lib/helpers.php';
 require __DIR__ . '/lib/currency.php';
 require __DIR__ . '/lib/site.php';
 require __DIR__ . '/lib/seo.php';
 require __DIR__ . '/lib/prerender.php';
+require __DIR__ . '/lib/backup.php';
 
 // if the file exists inside public/ (JS, CSS, images) let PHP serve it as it is
 $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
@@ -33,6 +34,7 @@ if ($path === '') {
 }
 $method = $_SERVER['REQUEST_METHOD'];
 $db = get_db();
+daily_backup();
 
 if ($path === '/robots.txt') {
     show_robots();
@@ -40,6 +42,15 @@ if ($path === '/robots.txt') {
 }
 if ($path === '/sitemap.xml') {
     show_sitemap($db);
+    exit;
+}
+
+// a missing script, style, font or image is a plain 404, never the React page
+// (a browser would try to run the page as a script and fail with a confusing error)
+if (preg_match('#^/(assets|images|fonts)/#', $path)) {
+    http_response_code(404);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo 'Not found';
     exit;
 }
 

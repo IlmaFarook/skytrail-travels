@@ -159,7 +159,7 @@ function seed_site_settings(PDO $db): void
         'business.country_code' => 'LK',
         'business.phone' => '+94 77 165 4746',
         'business.email' => 'enquiries@skytrailtravels.lk',
-        'business.founded' => '2015',
+        'business.founded' => '2020',
         'business.facebook' => 'https://www.facebook.com/',
         'business.instagram' => 'https://www.instagram.com/',
         'business.tiktok' => 'https://www.tiktok.com/',

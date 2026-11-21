@@ -4,6 +4,8 @@ import { api } from '../api';
 import { useRules, useSite } from '../context/SiteContext';
 import usePageMeta from '../hooks/usePageMeta';
 import SocialLinks from '../components/SocialLinks';
+import LimitedTextarea from '../components/LimitedTextarea';
+import { cleanName, emailAttrs } from '../lib/forms';
 
 
 // a small window around the business position
@@ -17,7 +19,7 @@ export default function AboutPage() {
   const { t } = useTranslation();
   usePageMeta(t('meta.about.title'), t('meta.about.description'));
   const { business } = useSite();
-  const { emailOk } = useRules();
+  const { config, emailOk, nameOk } = useRules();
   const [faqs, setFaqs] = useState(null);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export default function AboutPage() {
     e.preventDefault();
     setAlert(null);
     const errs = {};
-    if (!form.name.trim()) errs.name = true;
+    if (!nameOk(form.name)) errs.name = true;
     if (!emailOk(form.email.trim())) errs.email = true;
     if (!form.message.trim()) errs.message = true;
     setErrors(errs);
@@ -105,17 +107,19 @@ export default function AboutPage() {
         <form className="form-card" onSubmit={onSubmit} noValidate>
           <div className={`form-group${errors.name ? ' has-error' : ''}`}>
             <label htmlFor="c-name">{t('about.form.name')}</label>
-            <input id="c-name" value={form.name} onChange={update('name')} />
-            <div className="error-text">{t('validation.name')}</div>
+            <input id="c-name" value={form.name} maxLength={config?.nameMax} autoComplete="name"
+              onChange={(e) => setForm(f => ({ ...f, name: cleanName(e.target.value, config) }))} />
+            <div className="error-text">{t('validation.name', { max: config?.nameMax ?? '' })}</div>
           </div>
           <div className={`form-group${errors.email ? ' has-error' : ''}`}>
             <label htmlFor="c-email">{t('about.form.email')}</label>
-            <input id="c-email" type="email" value={form.email} onChange={update('email')} />
+            <input id="c-email" {...emailAttrs} value={form.email} onChange={update('email')}
+              onBlur={() => setForm(f => ({ ...f, email: f.email.trim().toLowerCase() }))} />
             <div className="error-text">{t('validation.email')}</div>
           </div>
           <div className={`form-group${errors.message ? ' has-error' : ''}`}>
             <label htmlFor="c-message">{t('about.form.message')}</label>
-            <textarea id="c-message" value={form.message} onChange={update('message')} />
+            <LimitedTextarea id="c-message" max={config?.messageMax} value={form.message} onChange={update('message')} />
             <div className="error-text">{t('validation.message')}</div>
           </div>
           <button type="submit" className="btn btn-primary btn-block">{t('about.form.send')}</button>

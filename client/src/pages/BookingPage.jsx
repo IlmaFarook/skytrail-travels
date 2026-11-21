@@ -1,19 +1,27 @@
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
 import { useRules } from '../context/SiteContext';
 import usePageMeta from '../hooks/usePageMeta';
+import PhoneInput from '../components/PhoneInput';
+import DateField from '../components/DateField';
+import LimitedTextarea from '../components/LimitedTextarea';
+import { cleanName, emailAttrs } from '../lib/forms';
+import { phoneValid } from '../lib/phone';
 
 
 export default function BookingPage() {
   const { t } = useTranslation();
   const { money, currency } = useCurrency();
-  const { config, emailOk, phoneOk, travellersOk, dateOk } = useRules();
+  const { config, emailOk, nameOk, travellersOk, dateOk } = useRules();
   usePageMeta(t('meta.booking.title'), t('meta.booking.description'));
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const here = useLocation();
+  const comeBack = { from: here.pathname + here.search };
   const [searchParams] = useSearchParams();
   const packageId = searchParams.get('package');
 
@@ -40,9 +48,9 @@ export default function BookingPage() {
 
   const validate = () => {
     const errs = {};
-    if (!form.full_name.trim()) errs.full_name = true;
+    if (!nameOk(form.full_name)) errs.full_name = true;
     if (!emailOk(form.email.trim())) errs.email = true;
-    if (!phoneOk(form.phone.trim())) errs.phone = true;
+    if (!phoneValid(form.phone)) errs.phone = true;
     if (!dateOk(form.travel_date)) errs.travel_date = true;
     if (!travellersOk(Number(form.travellers))) errs.travellers = true;
     setErrors(errs);
@@ -56,10 +64,8 @@ export default function BookingPage() {
     if (!validate()) { setAlert({ type: 'error', text: t('validation.fixBeforeSubmit') }); return; }
 
     try {
-      await api.createBooking({ package_id: packageId, ...form, travellers: Number(form.travellers) });
-      setAlert({ type: 'success', text: t('booking.success') });
-      setForm({ full_name: user?.name || '', email: user?.email || '', phone: '', travel_date: '', travellers: '', special_requests: '' });
-      setErrors({});
+      const saved = await api.createBooking({ package_id: packageId, ...form, travellers: Number(form.travellers) });
+      navigate(`/booking/confirmation/${saved.reference}`);
     } catch (err) {
       setAlert({ type: 'error', text: err.message || t('booking.submitFailed') });
     }
@@ -86,8 +92,8 @@ export default function BookingPage() {
         ) : !user ? (
           <div className="form-card">
             <div className="alert alert-error">{t('booking.loginNeeded')}</div>
-            <Link to="/login" className="btn btn-primary btn-block">{t('booking.login')}</Link>
-            <Link to="/register" className="btn btn-outline btn-block btn-stacked">{t('booking.createAccount')}</Link>
+            <Link to="/login" state={comeBack} className="btn btn-primary btn-block">{t('booking.login')}</Link>
+            <Link to="/register" state={comeBack} className="btn btn-outline btn-block btn-stacked">{t('booking.createAccount')}</Link>
           </div>
         ) : (
           <>
@@ -95,22 +101,26 @@ export default function BookingPage() {
             <form className="form-card" onSubmit={onSubmit} noValidate>
               <div className={`form-group${errors.full_name ? ' has-error' : ''}`}>
                 <label htmlFor="full_name">{t('booking.fullName')}</label>
-                <input id="full_name" value={form.full_name} onChange={update('full_name')} />
-                <div className="error-text">{t('validation.fullName')}</div>
+                <input id="full_name" value={form.full_name} maxLength={config?.nameMax} autoComplete="name"
+                  onChange={(e) => setForm(f => ({ ...f, full_name: cleanName(e.target.value, config) }))} />
+                <div className="error-text">{t('validation.fullName', { max: config?.nameMax ?? '' })}</div>
               </div>
               <div className={`form-group${errors.email ? ' has-error' : ''}`}>
                 <label htmlFor="email">{t('booking.email')}</label>
-                <input id="email" type="email" value={form.email} onChange={update('email')} />
+                <input id="email" {...emailAttrs} value={form.email} onChange={update('email')}
+                  onBlur={() => setForm(f => ({ ...f, email: f.email.trim().toLowerCase() }))} />
                 <div className="error-text">{t('validation.email')}</div>
               </div>
               <div className={`form-group${errors.phone ? ' has-error' : ''}`}>
                 <label htmlFor="phone">{t('booking.phone')}</label>
-                <input id="phone" type="tel" placeholder={t('booking.phonePlaceholder')} value={form.phone} onChange={update('phone')} />
+                <PhoneInput id="phone" value={form.phone} invalid={errors.phone}
+                  onChange={(phone) => setForm(f => ({ ...f, phone }))} />
                 <div className="error-text">{t('validation.phone')}</div>
               </div>
               <div className={`form-group${errors.travel_date ? ' has-error' : ''}`}>
                 <label htmlFor="travel_date">{t('booking.travelDate')}</label>
-                <input id="travel_date" type="date" min={config?.minTravelDate} value={form.travel_date} onChange={update('travel_date')} />
+                <DateField id="travel_date" value={form.travel_date} min={config?.minTravelDate} max={config?.maxTravelDate}
+                  invalid={errors.travel_date} onChange={(travel_date) => setForm(f => ({ ...f, travel_date }))} />
                 <div className="error-text">{t('validation.travelDateFuture')}</div>
               </div>
               <div className={`form-group${errors.travellers ? ' has-error' : ''}`}>
@@ -120,7 +130,7 @@ export default function BookingPage() {
               </div>
               <div className="form-group">
                 <label htmlFor="special_requests">{t('booking.requests')}</label>
-                <textarea id="special_requests" maxLength={config?.specialRequestsMax} placeholder={t('booking.requestsPlaceholder')}
+                <LimitedTextarea id="special_requests" max={config?.specialRequestsMax} placeholder={t('booking.requestsPlaceholder')}
                   value={form.special_requests} onChange={update('special_requests')} />
               </div>
               <button type="submit" className="btn btn-primary btn-block">{t('booking.submit')}</button>

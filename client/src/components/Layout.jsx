@@ -1,5 +1,5 @@
 import { Suspense, useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useSite } from '../context/SiteContext';
@@ -7,6 +7,7 @@ import Logo from './Logo';
 import CompareBar from './CompareBar';
 import SocialLinks from './SocialLinks';
 import CurrencySwitcher from './CurrencySwitcher';
+import ErrorBoundary from './ErrorBoundary';
 
 function AuthLinks({ onNavigate }) {
   const { t } = useTranslation();
@@ -44,6 +45,7 @@ export default function Layout() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { business } = useSite();
+  const { pathname } = useLocation();
 
   const navLinks = [
     { to: '/', label: t('nav.home'), end: true },
@@ -85,9 +87,11 @@ export default function Layout() {
       </header>
 
       <main id="main">
-        <Suspense fallback={<p className="container">{t('common.loading')}</p>}>
-          <Outlet />
-        </Suspense>
+        <ErrorBoundary key={pathname}>
+          <Suspense fallback={<p className="container">{t('common.loading')}</p>}>
+            <Outlet />
+          </Suspense>
+        </ErrorBoundary>
       </main>
 
       <CompareBar />

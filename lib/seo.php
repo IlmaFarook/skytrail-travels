@@ -113,6 +113,15 @@ function get_page_meta($path, $db) {
         ];
     }
 
+    if (preg_match('#^/booking/confirmation/[A-Za-z0-9-]{6,20}$#', $path)) {
+        return [
+            'title' => t('meta.booking_confirmation.title'),
+            'description' => t('meta.booking_confirmation.description'),
+            'noindex' => true,
+            'jsonld' => null,
+        ];
+    }
+
     return null;
 }
 
@@ -178,6 +187,7 @@ function show_robots() {
     echo "Allow: /\n";
     echo "Disallow: /admin\n";
     echo "Disallow: /my-bookings\n";
+    echo "Disallow: /booking/\n";
     echo "Disallow: /api/\n\n";
     echo 'Sitemap: ' . site_url() . "/sitemap.xml\n";
 }

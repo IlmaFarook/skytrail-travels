@@ -23,7 +23,7 @@ npm start         # serves everything on http://localhost:3000
 
 The built app is already in `public/`, so `npm start` alone is enough to look at the site. The database is created on the first request.
 
-For front-end work with hot reload, run `npm run dev` inside `client/`. Vite sends `/api` requests to the PHP server on port 3000, so start that first.
+`npm start` serves the files that were built, so a change shows only after `npm run build` and a refresh. For front-end work with live updates run `npm run dev` and open http://localhost:5173. It starts the PHP site on port 3000 too (or uses the one already running), and Vite sends `/api` requests to it.
 
 ### Demo accounts
 
@@ -33,8 +33,6 @@ For front-end work with hot reload, run `npm run dev` inside `client/`. Vite sen
 | Admin | admin@skytrailtravels.lk | Admin@123 |
 
 ## Tests
-
-Start the server first (`npm start`), then:
 
 ```bash
 npm install            # once, installs Playwright and axe-core for the browser tests
@@ -46,7 +44,16 @@ npm run test:i18n      # checks that no text is typed into the React code
 node --test tests/i18n-server.test.mjs   # same check for the PHP code
 ```
 
-The tests share one database and add data, so do not run two suites at once. To start from clean data, delete `db/skytrail.db` (and its `-shm` and `-wal` files) and open any page.
+The API and browser tests start their own server (port 3100) with their own empty database, `db/test.db`, and remove it afterwards. They never touch the real accounts and bookings in `db/skytrail.db`, so nothing needs resetting.
+
+## Your data
+
+Accounts, bookings, packages, messages and settings live in one SQLite file, `db/skytrail.db` by default, and are kept between runs. The demo data is added once when the file is new and is never put back, so whatever staff delete or change stays that way.
+
+- **Backups:** `npm start` saves a copy in a `backups` folder next to the database, the first request each day saves another, and `npm run backup` makes one on demand. The newest ten are kept, and a backup is refused if the database fails its integrity check. To restore, stop the site and copy a backup over the database file.
+- **Somewhere else:** to keep the file outside a synced folder such as OneDrive, put `SKYTRAIL_DB=/full/path/skytrail.db` in a `.env` file in this folder (it is not in git).
+- **Wiping it on purpose:** `npm run db:reset -- --yes` (a backup is saved first).
+- **Check:** `npm run test:db` proves data survives restarts and backups work.
 
 ## Exchange rates
 

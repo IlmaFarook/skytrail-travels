@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
+import { LoginRedirect } from '../lib/access';
 import BookingsTab from '../components/admin/BookingsTab';
 import PackagesTab from '../components/admin/PackagesTab';
 import DestinationsTab from '../components/admin/DestinationsTab';
@@ -33,6 +34,9 @@ export default function AdminPage() {
 
   if (loading) return <p className="container">{t('common.loading')}</p>;
 
+  if (!user) return <LoginRedirect />;
+
+  // signed in, but as a customer
   if (!isAdmin) {
     return (
       <>
@@ -40,7 +44,7 @@ export default function AdminPage() {
         <section className="container">
           <div className="form-card">
             <div className="alert alert-error">{t('admin.notAllowed')}</div>
-            <Link to="/login" className="btn btn-primary btn-block">{t('admin.login')}</Link>
+            <Link to="/" className="btn btn-primary btn-block">{t('nav.home')}</Link>
           </div>
         </section>
       </>
@@ -49,8 +53,8 @@ export default function AdminPage() {
 
   return (
     <>
-      <div className="page-header"><div className="container"><p className="eyebrow">{t('admin.eyebrow')}</p><h1>{t('admin.heading')}</h1><p>{t('admin.intro')}</p></div></div>
-      <section className="container">
+      <div className="page-header"><div className="container container-wide"><p className="eyebrow">{t('admin.eyebrow')}</p><h1>{t('admin.heading')}</h1><p>{t('admin.intro')}</p></div></div>
+      <section className="container container-wide">
         <div className="stats">
           <div className="stat"><span className="stat-n">{stats?.totalBookings ?? t('common.na')}</span><span className="stat-l">{t('admin.stats.total')}</span></div>
           <div className="stat"><span className="stat-n">{stats?.pendingBookings ?? t('common.na')}</span><span className="stat-l">{t('admin.stats.pending')}</span></div>

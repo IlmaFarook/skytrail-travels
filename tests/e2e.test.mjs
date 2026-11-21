@@ -5,11 +5,27 @@ import assert from 'node:assert/strict';
 import playwright from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
 
-const BASE = process.env.TEST_URL || 'http://localhost:3000';
+const BASE = process.env.TEST_URL || 'http://localhost:3100';
 const engine = process.env.BROWSER || 'chromium';
 const stamp = Date.now();
 const email = `e2e${stamp}@example.com`;
 const password = 'Passw0rdOK';
+
+// opens the calendar on a date field and clicks a day, moving to the right month first
+async function pickDate(page, id, iso) {
+  await page.click(`#${id}`);
+  await page.waitForSelector('.date-popover');
+  for (let i = 0; i < 30; i++) {
+    const day = page.locator(`td[data-day="${iso}"]:not([data-outside]) button`);
+    if (await day.count()) {
+      await day.click();
+      await page.waitForSelector('.date-popover', { state: 'detached' });
+      return;
+    }
+    await page.getByRole('button', { name: /next month/i }).click();
+  }
+  throw new Error(`${iso} is not in the calendar`);
+}
 
 function futureDate(days) {
   return new Date(Date.now() + days * 86400000).toISOString().slice(0, 10);
@@ -38,12 +54,18 @@ async function newPage(options = {}, watched = true) {
   return page;
 }
 
+// waits for the network to go quiet, but not for ever: the About page embeds an
+// OpenStreetMap iframe, and when that outside site is slow the network never settles
+async function quiet_network(page) {
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+}
+
 async function login(page, who, pass) {
   await page.goto(BASE + '/login');
   // WebKit now and then lost a value typed within milliseconds of the form appearing,
   // so let the page settle first and check the field kept its value
   await page.waitForSelector('#email');
-  await page.waitForLoadState('networkidle');
+  await quiet_network(page);
   await page.fill('#email', who);
   await page.fill('#password', pass);
   if ((await page.inputValue('#email')) !== who) await page.fill('#email', who);
@@ -84,7 +106,7 @@ test('real photos load on the cards and the detail page', async () => {
   await page.evaluate(async () => {
     for (let y = 0; y < document.body.scrollHeight; y += 600) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 120)); }
   });
-  await page.waitForLoadState('networkidle');
+  await quiet_network(page);
   const info = await page.evaluate(() => {
     const imgs = [...document.querySelectorAll('img.place-photo')];
     return { total: imgs.length, broken: imgs.filter(i => !i.complete || i.naturalWidth === 0).map(i => i.src) };
@@ -177,14 +199,22 @@ test('customer can book, edit and cancel', async () => {
   await page.waitForSelector('#full_name');
   await page.fill('#full_name', 'E2E Traveller');
   await page.fill('#phone', '0771234567');
-  await page.fill('#travel_date', futureDate(20));
+  await pickDate(page, 'travel_date', futureDate(20));
   await page.fill('#travellers', '2');
   await page.click('button[type="submit"]');
-  await page.waitForSelector('.alert-success');
 
-  await page.goto(BASE + '/my-bookings');
+  // a confirmation page with the reference, not a message on the form
+  await page.waitForURL(/\/booking\/confirmation\/ST\d{4}-[A-Z0-9]{6}$/);
+  const reference = (await page.locator('#booking-reference').innerText()).trim();
+  assert.match(reference, /^ST\d{4}-[A-HJ-NP-Z2-9]{6}$/);
+  assert.match(await page.locator('.confirm-card').innerText(), /E2E|Pending|Kandy/i);
+  await page.reload(); // the page works after a refresh too
+  await page.waitForSelector('#booking-reference');
+  assert.equal((await page.locator('#booking-reference').innerText()).trim(), reference);
+
+  await page.click('a:has-text("View my bookings")');
   await page.waitForSelector('tbody tr .status-pill');
-  assert.match(await page.locator('tbody tr').first().innerText(), /pending/i);
+  assert.match(await page.locator('tbody tr').first().innerText(), new RegExp(`${reference}[\\s\\S]*pending`, 'i'));
   await page.click('button:has-text("Edit")');
   await page.fill('#e-travellers', '4');
   await page.click('button:has-text("Save changes")');
@@ -219,6 +249,13 @@ test('admin can manage packages, customers, content and read messages', async ()
   await page.waitForSelector('tbody tr');
   await page.selectOption('#status-filter', 'Cancelled');
   assert.ok(await page.locator('tbody tr .status-pill').count() >= 1);
+  // every booking shows its reference, and the reference can be searched
+  const adminRef = (await page.locator('tbody tr .booking-ref').first().innerText()).trim();
+  assert.match(adminRef, /^ST\d{4}-/);
+  await page.selectOption('#status-filter', '');
+  await page.fill('#booking-search', adminRef.toLowerCase());
+  assert.equal(await page.locator('tbody tr .booking-ref').count(), 1);
+  await page.fill('#booking-search', '');
 
   // add, edit and delete a package
   await page.click('[role="tab"]:has-text("Packages")');
@@ -361,11 +398,51 @@ test('the booking form takes its limits from the API', async () => {
   const page = await newPage();
   await login(page, email, password);
   await page.goto(BASE + '/booking?package=1');
-  await page.waitForFunction(() => document.querySelector('#travel_date') && document.querySelector('#travel_date').min);
   const cfg = await (await page.request.get(BASE + '/api/config')).json();
-  assert.equal(await page.getAttribute('#travel_date', 'min'), cfg.minTravelDate);
+  await page.waitForFunction(max => document.querySelector('#special_requests')?.maxLength === max, cfg.specialRequestsMax);
   assert.equal(await page.getAttribute('#travellers', 'max'), String(cfg.maxTravellers));
-  assert.equal(await page.getAttribute('#special_requests', 'maxlength'), String(cfg.specialRequestsMax));
+  assert.equal(await page.getAttribute('#full_name', 'maxlength'), String(cfg.nameMax));
+
+  // the calendar starts at the earliest allowed day: the day before is disabled
+  await page.click('#travel_date');
+  await page.waitForSelector('.date-popover');
+  const dayBefore = new Date(Date.parse(cfg.minTravelDate) - 86400000).toISOString().slice(0, 10);
+  const blocked = page.locator(`td[data-day="${dayBefore}"]:not([data-outside])`);
+  if (await blocked.count()) assert.equal(await blocked.getAttribute('data-disabled'), 'true');
+  assert.equal(await page.locator(`td[data-day="${cfg.minTravelDate}"]:not([data-outside]) button`).isEnabled(), true);
+  await page.keyboard.press('Escape');
+  await page.context().close();
+});
+
+test('booking form: names, phone numbers and message length are handled like a production form', async () => {
+  const page = await newPage();
+  await login(page, email, password);
+  await page.goto(BASE + '/booking?package=1');
+  await page.waitForSelector('#full_name');
+
+  // digits and symbols never get into a name
+  await page.fill('#full_name', "Ilma 123 <b>Fa'rook</b>");
+  assert.equal(await page.inputValue('#full_name'), "Ilma bFa'rookb");
+
+  // the phone box formats as you type and knows the country
+  assert.match(await page.locator('.phone-country span').innerText(), /\+94/);
+  await page.fill('#phone', '0771234567');
+  assert.equal(await page.inputValue('#phone'), '077 123 4567');
+  await page.fill('#phone', '+971501234567');
+  assert.match(await page.locator('.phone-country span').innerText(), /\+971/);
+  await page.selectOption('.phone-country select', 'GB');
+  assert.match(await page.locator('.phone-country span').innerText(), /\+44/);
+
+  // a number that is too short for the country is refused before anything is sent
+  await page.fill('#phone', '12');
+  await page.fill('#travellers', '2');
+  await pickDate(page, 'travel_date', futureDate(10));
+  await page.click('button[type="submit"]');
+  await page.waitForSelector('.has-error #phone');
+
+  // the message counter follows what is typed
+  await page.fill('#special_requests', 'Window seat');
+  assert.match(await page.locator('#special_requests-count').innerText(), /^11 \/ \d+ characters$/);
   await page.context().close();
 });
 
@@ -408,7 +485,7 @@ test('mobile: menu opens and pages do not scroll sideways', async () => {
   assert.equal(await page.locator('#nav-auth-area-mobile a:visible').count() >= 2, true);
   for (const path of ['/', '/destinations', '/gallery', '/about', '/login', '/privacy', '/credits', '/packages/1']) {
     await page.goto(BASE + path);
-    await page.waitForLoadState('networkidle');
+    await quiet_network(page);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     assert.ok(overflow <= 1, `${path} overflows by ${overflow}px`);
   }
@@ -456,7 +533,7 @@ test('accessibility: no serious or critical axe violations', async () => {
   const bad = [];
   for (const path of paths) {
     await page.goto(BASE + path);
-    await page.waitForLoadState('networkidle');
+    await quiet_network(page);
     await page.waitForTimeout(400);
     const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze();
     const serious = result.violations.filter(v => v.impact === 'serious' || v.impact === 'critical');
@@ -467,7 +544,7 @@ test('accessibility: no serious or critical axe violations', async () => {
 
   const quiet = await newPage({}, false);
   await quiet.goto(BASE + '/no-such-page');
-  await quiet.waitForLoadState('networkidle');
+  await quiet_network(quiet);
   const notFound = await new AxeBuilder({ page: quiet }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze();
   notFound.violations.filter(v => v.impact === 'serious' || v.impact === 'critical')
     .forEach(v => bad.push(`404 page: ${v.id} ${v.help}`));
@@ -477,7 +554,7 @@ test('accessibility: no serious or critical axe violations', async () => {
   await login(admin, 'admin@skytrailtravels.lk', 'Admin@123');
   for (const tab of ['bookings', 'packages', 'destinations', 'customers', 'content', 'messages', 'currencies', 'site']) {
     await admin.goto(BASE + '/admin?tab=' + tab);
-    await admin.waitForLoadState('networkidle');
+    await quiet_network(admin);
     await admin.waitForTimeout(400);
     const result = await new AxeBuilder({ page: admin }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze();
     const serious = result.violations.filter(v => v.impact === 'serious' || v.impact === 'critical');
@@ -486,6 +563,138 @@ test('accessibility: no serious or critical axe violations', async () => {
   }
   await admin.context().close();
   assert.deepEqual(bad, []);
+});
+
+test('a page whose script file is out of date reloads itself instead of going blank', async () => {
+  const page = await newPage({}, false);
+  await login(page, email, password);
+  const pages = [
+    ['MyBookingsPage', '/my-bookings', 'My bookings'],
+    ['BookingPage', '/booking?package=1', 'Enquire'],
+    ['ComparePage', '/compare', 'Compare'],
+    ['PrivacyPage', '/privacy', 'Privacy'],
+    ['CreditsPage', '/credits', 'Photo credits'],
+  ];
+  for (const [chunk, path, heading] of pages) {
+    // the first request for this page's file fails, like it does after a new build
+    let blocked = false;
+    await page.evaluate(() => sessionStorage.clear());
+    await page.route(`**/assets/${chunk}-*.js`, route => {
+      if (blocked) return route.continue();
+      blocked = true;
+      return route.fulfill({ status: 404, contentType: 'text/html', body: 'not found' });
+    });
+    await page.evaluate(p => {
+      history.pushState({}, '', p);
+      dispatchEvent(new PopStateEvent('popstate'));
+    }, path);
+    await page.waitForSelector('h1');
+    await page.waitForFunction(h => document.querySelector('h1')?.innerText.includes(h), heading);
+    assert.ok(blocked, `${chunk} was requested`);
+  }
+});
+
+test('search box suggests matches and popular destinations, and works from the keyboard', async () => {
+  const page = await newPage();
+  await page.goto(BASE + '/');
+  await page.click('.search-bar input');
+  // before typing: a hint on the left and the popular destinations on the right
+  await page.waitForSelector('.suggest-popular a');
+  assert.equal(await page.locator('.suggest-popular a').count(), 5);
+  assert.match(await page.locator('.suggest-note').innerText(), /at least 2 letters/);
+
+  await page.fill('.search-bar input', 'mir');
+  await page.waitForSelector('[role="option"]');
+  const first = page.locator('[role="option"]').first();
+  assert.ok((await first.locator('.suggest-title').innerText()).length > 0);
+  assert.match(await first.locator('.suggest-sub').innerText(), /journey/);
+  assert.equal(await page.getAttribute('.search-bar input', 'aria-expanded'), 'true');
+
+  // the hero text fades in for about a second, and axe reads half-faded colours
+  await page.waitForTimeout(1500);
+  const accessibility = await new AxeBuilder({ page }).analyze();
+  assert.deepEqual(accessibility.violations.filter(v => ['serious', 'critical'].includes(v.impact)).map(v => v.id), []);
+
+  await page.keyboard.press('ArrowDown');
+  assert.equal(await page.getAttribute('[role="option"]:first-child', 'aria-selected'), 'true');
+  await page.keyboard.press('Enter');
+  await page.waitForURL(/\/destinations\?destination=\d+/);
+
+  await page.goto(BASE + '/');
+  await page.click('.search-bar input');
+  await page.waitForSelector('.suggest-panel');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('.suggest-panel').count(), 0);
+
+  // a popular destination opens that destination's journeys
+  await page.click('.search-bar input');
+  await page.click('.suggest-popular a');
+  await page.waitForURL(/\/destinations\?destination=\d+/);
+});
+
+test('featured journeys open the package when any part of the card is clicked', async () => {
+  const page = await newPage();
+  await page.goto(BASE + '/');
+  await page.waitForSelector('.card .desc');
+  // force: the card's own link covers it, so playwright would otherwise wait for the cover to go away
+  await page.locator('.card .desc').first().click({ force: true });
+  await page.waitForURL(/\/packages\/\d+/);
+  await page.goto(BASE + '/');
+  await page.getByRole('link', { name: 'Featured journeys' }).click();
+  await page.waitForURL(/\/destinations$/);
+});
+
+test('login and private pages: no login form for people already in, and a way back after logging in', async () => {
+  // a signed-in customer who opens the login or register page is sent home
+  const page = await newPage();
+  await login(page, email, password);
+  await page.goto(BASE + '/login');
+  await page.waitForURL(BASE + '/');
+  await page.goto(BASE + '/register');
+  await page.waitForURL(BASE + '/');
+
+  // the login runs out in the background: the next private page sends them to log in again
+  expectedStatus = '401'; // the browser logs the refused request, that is the point of this step
+  await page.context().clearCookies();
+  await page.click('#nav-auth-area a:has-text("My bookings")');
+  await page.waitForURL(/\/login$/);
+  expectedStatus = null;
+  await page.fill('#email', email);
+  await page.fill('#password', password);
+  await page.click('button[type="submit"]');
+  await page.waitForURL(BASE + '/my-bookings'); // back where they were going
+  await page.context().close();
+
+  // a visitor who opens a private page is sent to log in, then returned to it
+  const visitor = await newPage();
+  await visitor.goto(BASE + '/my-bookings');
+  await visitor.waitForURL(/\/login$/);
+  await visitor.fill('#email', email);
+  await visitor.fill('#password', password);
+  await visitor.click('button[type="submit"]');
+  await visitor.waitForURL(BASE + '/my-bookings');
+  await visitor.context().close();
+
+  // staff go straight to the admin area, and never see the customer bookings page
+  const staff = await newPage();
+  await staff.goto(BASE + '/login');
+  await staff.fill('#email', 'admin@skytrailtravels.lk');
+  await staff.fill('#password', 'Admin@123');
+  await staff.click('button[type="submit"]');
+  await staff.waitForURL(/\/admin$/);
+  await staff.goto(BASE + '/login');
+  await staff.waitForURL(/\/admin$/);
+  await staff.goto(BASE + '/my-bookings');
+  await staff.waitForURL(/\/admin$/);
+  await staff.context().close();
+
+  // a customer who opens the admin area is told it is not for them, with a way home
+  const customer = await newPage();
+  await login(customer, email, password);
+  await customer.goto(BASE + '/admin');
+  await customer.waitForSelector('.alert-error');
+  assert.equal(await customer.locator('.form-card a:has-text("Home")').count(), 1);
+  await customer.context().close();
 });
 
 test('no console errors during the whole run', () => {
