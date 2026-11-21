@@ -1,0 +1,17 @@
+{
+  "name": "skytrail-travels",
+  "version": "1.0.0",
+  "description": "SkyTrail Travels: Unit 13 Web Design and Development coursework project (React front-end, PHP back-end).",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix client install && npm --prefix client run build",
+    "start": "php -S localhost:3000 -t public router.php",
+    "test": "node --test tests/api.test.mjs",
+    "test:e2e": "node --test tests/e2e.test.mjs",
+    "test:i18n": "node --test tests/i18n.test.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "playwright": "^1.65.1"
+  }
+}

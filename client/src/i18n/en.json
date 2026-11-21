@@ -1,0 +1,668 @@
+{
+  "brand": {
+    "name": "SkyTrail",
+    "tagline": "Travels · Kandy",
+    "fullName": "SkyTrail Travels"
+  },
+  "a11y": {
+    "skipToMain": "Skip to main content",
+    "toggleNavigation": "Toggle navigation",
+    "opensNewTab": "(opens in a new tab)",
+    "illustration": "{{name}} illustration",
+    "ratingOutOf": "{{rating}} out of 5"
+  },
+  "nav": {
+    "home": "Home",
+    "destinations": "Destinations",
+    "gallery": "Gallery",
+    "about": "About & Contact",
+    "login": "Login",
+    "signUp": "Sign up",
+    "greeting": "Hi, {{name}}",
+    "admin": "Admin",
+    "myBookings": "My Bookings",
+    "logout": "Logout"
+  },
+  "footer": {
+    "tagline": "Wander well.",
+    "planJourney": "Plan a journey",
+    "studio": "Studio",
+    "explore": "Explore",
+    "destinations": "Destinations",
+    "galleryJournal": "Gallery & Journal",
+    "faqs": "FAQs",
+    "compare": "Compare packages",
+    "privacy": "Privacy policy",
+    "account": "Account",
+    "login": "Login",
+    "createAccount": "Create an account",
+    "follow": "Follow",
+    "copyright": "© 2026 SkyTrail Travels (Pvt) Ltd.",
+    "est": "Est. {{founded}} · {{locality}}, {{region}}",
+    "credits": "Photo credits"
+  },
+  "social": {
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "tiktok": "TikTok"
+  },
+  "common": {
+    "na": "n/a",
+    "loading": "Loading…",
+    "clear": "Clear",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "choose": "Choose…",
+    "browsePackages": "Browse packages",
+    "day_one": "day",
+    "day_other": "days",
+    "daysCount_one": "{{count}} day",
+    "daysCount_other": "{{count}} days",
+    "perPerson": "per person",
+    "ratingShort": "{{rating}}/5",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "status": {
+    "Pending": "Pending",
+    "Confirmed": "Confirmed",
+    "Cancelled": "Cancelled",
+    "Completed": "Completed"
+  },
+  "validation": {
+    "fixHighlighted": "Please fix the highlighted fields.",
+    "fixBeforeSubmit": "Please fix the highlighted fields before submitting.",
+    "fullName": "Please enter your full name.",
+    "name": "Please enter your name.",
+    "email": "Please enter a valid email address.",
+    "phone": "Please enter a valid phone number.",
+    "password": "Please enter your password.",
+    "passwordStrength": "Use at least {{min}} characters, including a letter and a number.",
+    "passwordMatch": "Passwords do not match.",
+    "message": "Please enter a message.",
+    "travelDateFuture": "Please select a future travel date.",
+    "travelDateChoose": "Please choose a future date.",
+    "travellers": "Please enter between 1 and {{max}} travellers.",
+    "travellersShort": "Enter between 1 and {{max}} travellers."
+  },
+  "errors": {
+    "requestFailed": "Request failed ({{status}})"
+  },
+  "meta": {
+    "home": {
+      "title": "Discover Sri Lanka & Beyond",
+      "description": "Handpicked Sri Lankan and international holiday packages from SkyTrail Travels in Kandy."
+    },
+    "destinations": {
+      "title": "Destinations & Packages",
+      "description": "Search and filter SkyTrail holiday packages by destination, category, price and trip length."
+    },
+    "package": {
+      "title": "{{title}} - {{destination}}",
+      "fallback": "Package"
+    },
+    "booking": {
+      "title": "Book or Enquire",
+      "description": "Submit a SkyTrail booking enquiry."
+    },
+    "login": {
+      "title": "Login",
+      "description": "Log in to manage your SkyTrail bookings."
+    },
+    "register": {
+      "title": "Create an Account",
+      "description": "Create a free SkyTrail account to book packages and track your enquiries."
+    },
+    "myBookings": {
+      "title": "My Bookings",
+      "description": "View, edit and cancel your SkyTrail bookings."
+    },
+    "admin": {
+      "title": "Admin Dashboard",
+      "description": "SkyTrail administration."
+    },
+    "gallery": {
+      "title": "Gallery & Travel Journal",
+      "description": "Destination highlights and travel journal posts from SkyTrail Travels."
+    },
+    "about": {
+      "title": "About & Contact",
+      "description": "About SkyTrail Travels, a Kandy travel agency since 2015: contact details, location map and FAQs."
+    },
+    "compare": {
+      "title": "Compare Packages",
+      "description": "Compare SkyTrail holiday packages side by side by price, duration and category."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "How SkyTrail Travels collects, uses and protects your personal data."
+    },
+    "notFound": {
+      "title": "Page not found"
+    },
+    "credits": {
+      "title": "Photo Credits",
+      "description": "Who took the photographs on the SkyTrail Travels website, their licences, and the other sources we use."
+    }
+  },
+  "home": {
+    "eyebrow": "Sri Lanka & the Indian Ocean",
+    "heading": "Where will the <em>road</em> take you next?",
+    "lede": "Handpicked journeys across Sri Lanka and beyond: hill-country rail, whale-watching coasts, leopard safaris and slow honeymoons, planned by people who have walked them.",
+    "searchPlaceholder": "Try Mirissa, safari, honeymoon…",
+    "searchLabel": "Search destinations or packages",
+    "search": "Search",
+    "stats": {
+      "est": "Est.",
+      "destinations": "Destinations",
+      "journeys": "Curated journeys"
+    },
+    "stamp": "KANDY · SRI LANKA · SINCE 2015 · ",
+    "featured": {
+      "title": "Featured journeys",
+      "subtitle": "Our most loved, hand-picked holiday experiences.",
+      "all": "All journeys",
+      "loading": "Loading packages…",
+      "empty": "No packages available yet."
+    },
+    "why": {
+      "title": "Why travel with SkyTrail",
+      "expertise": {
+        "number": "i",
+        "title": "Local expertise",
+        "text": "Our team knows Sri Lanka's hidden gems and the best international escapes, so every itinerary is built on real experience, not guesswork."
+      },
+      "pricing": {
+        "number": "ii",
+        "title": "Transparent pricing",
+        "text": "No hidden fees. Every package shows a clear price upfront, with the option to enquire and customise before you commit."
+      },
+      "support": {
+        "number": "iii",
+        "title": "Dedicated support",
+        "text": "From your first enquiry to the day you return home, a SkyTrail travel consultant is on hand to help."
+      }
+    },
+    "notes": {
+      "title": "Notes from travellers",
+      "loading": "Loading testimonials…"
+    }
+  },
+  "destinations": {
+    "eyebrow": "Destinations",
+    "heading": "Destinations & packages",
+    "intro": "Filter by destination, category, price and trip length to find your perfect holiday.",
+    "filters": {
+      "destination": "Destination",
+      "allDestinations": "All destinations",
+      "category": "Category",
+      "allCategories": "All categories",
+      "maxPrice": "Max price (LKR)",
+      "maxPricePlaceholder": "e.g. 100000",
+      "maxDuration": "Max duration (days)",
+      "maxDurationPlaceholder": "e.g. 5",
+      "keyword": "Keyword",
+      "keywordPlaceholder": "Search title or destination",
+      "apply": "Apply Filters"
+    },
+    "found_one": "{{count}} package found",
+    "found_other": "{{count}} packages found",
+    "none": "No packages match your filters. Try widening your search.",
+    "resultsHeading": "Packages"
+  },
+  "package": {
+    "notFound": "Package not found.",
+    "browseAll": "Browse all packages",
+    "loading": "Loading package…",
+    "about": "About {{name}}",
+    "summaryTitle": "Booking summary",
+    "from": "From",
+    "duration": "Duration",
+    "category": "Category",
+    "destination": "Destination",
+    "book": "Book / Enquire Now",
+    "back": "← Back to all packages"
+  },
+  "booking": {
+    "heading": "Book / Enquire",
+    "noPackage": "No package selected.",
+    "loadingPackage": "Loading package…",
+    "loadError": "Could not load package details.",
+    "packageLabel": "{{title}}: {{destination}}, {{country}} ({{price}} per person)",
+    "loginNeeded": "You need to be logged in to submit a booking enquiry.",
+    "login": "Login",
+    "createAccount": "Create an account",
+    "noPackageSelected": "No package selected. Please choose a package first.",
+    "success": "Thank you! Your booking enquiry has been submitted. Our team will contact you shortly.",
+    "submitFailed": "Could not submit your enquiry.",
+    "fullName": "Full Name *",
+    "email": "Email Address *",
+    "phone": "Phone Number *",
+    "travelDate": "Preferred Travel Date *",
+    "travellers": "Number of Travellers *",
+    "requests": "Special Requests",
+    "phonePlaceholder": "e.g. 0771234567",
+    "requestsPlaceholder": "Dietary requirements, accessibility needs, celebration occasions, etc.",
+    "submit": "Submit Enquiry"
+  },
+  "auth": {
+    "login": {
+      "heading": "Login",
+      "intro": "Access your bookings and account details.",
+      "email": "Email Address",
+      "password": "Password",
+      "submit": "Login",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "demo": "Demo accounts. Customer: customer@example.com / Customer@123 · Admin: admin@skytrailtravels.lk / Admin@123",
+      "failed": "Login failed."
+    },
+    "register": {
+      "heading": "Create an Account",
+      "intro": "Sign up to book packages and track your enquiries.",
+      "name": "Full Name",
+      "email": "Email Address",
+      "password": "Password",
+      "confirm": "Confirm Password",
+      "submit": "Sign Up",
+      "haveAccount": "Already have an account?",
+      "login": "Login",
+      "failed": "Registration failed."
+    }
+  },
+  "myBookings": {
+    "eyebrow": "Account",
+    "heading": "My bookings",
+    "intro": "Track, change or cancel your enquiries and bookings.",
+    "headers": {
+      "package": "Package",
+      "travelDate": "Travel date",
+      "travellers": "Travellers",
+      "price": "Price",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "empty": "You have no bookings yet.",
+    "updated": "Your booking was updated.",
+    "cancelled": "Your booking was cancelled.",
+    "confirmCancel": "Cancel your booking for {{title}}?",
+    "note": "Total price is the package price multiplied by the number of travellers. Confirmed bookings can be cancelled but not edited, please contact us to change those.",
+    "editTitle": "Edit booking: {{title}}",
+    "phone": "Phone number",
+    "date": "Travel date",
+    "travellers": "Number of travellers",
+    "requests": "Special requests",
+    "saveChanges": "Save changes"
+  },
+  "compare": {
+    "barLabel": "Packages selected for comparison",
+    "remove": "Remove {{title}} from comparison",
+    "selected": "{{n}} of {{max}} selected",
+    "now": "Compare now",
+    "pickOne": "Pick one more to compare",
+    "toggle": "Compare",
+    "toggleFull": "Compare ({{max}} max)",
+    "eyebrow": "Compare",
+    "heading": "Compare packages",
+    "intro": "Line up to three journeys side by side and pick the one that fits.",
+    "none": "You have not picked any packages yet.",
+    "needMore": "Pick at least one more package to compare.",
+    "tableCaption": "Comparison of selected packages",
+    "removeBtn": "Remove",
+    "rows": {
+      "destination": "Destination",
+      "category": "Category",
+      "price": "Price per person",
+      "duration": "Duration",
+      "perDay": "Price per day",
+      "included": "What's included"
+    },
+    "lowest": "Lowest price",
+    "shortest": "Shortest",
+    "bestValue": "Best value",
+    "book": "Book / Enquire",
+    "clearAll": "Clear comparison"
+  },
+  "admin": {
+    "notAllowed": "Administrator access required. Please log in with an admin account.",
+    "login": "Login",
+    "eyebrow": "Staff area",
+    "heading": "Admin Dashboard",
+    "intro": "Manage bookings, packages, customers and website content.",
+    "stats": {
+      "total": "Total Bookings",
+      "pending": "Pending Enquiries",
+      "customers": "Registered Customers",
+      "packages": "Active Packages"
+    },
+    "tablist": "Admin sections",
+    "tabs": {
+      "bookings": "Bookings",
+      "packages": "Packages",
+      "destinations": "Destinations",
+      "customers": "Customers",
+      "content": "Website content",
+      "messages": "Messages",
+      "currencies": "Currencies",
+      "site": "Site settings"
+    },
+    "bookings": {
+      "heading": "Booking enquiries",
+      "show": "Show",
+      "allStatuses": "All statuses",
+      "headers": {
+        "customer": "Customer",
+        "package": "Package",
+        "destination": "Destination",
+        "travelDate": "Travel Date",
+        "travellers": "Travellers",
+        "contact": "Contact",
+        "status": "Status",
+        "update": "Update"
+      },
+      "none": "No booking enquiries to show.",
+      "statusFor": "Status for booking {{id}}"
+    },
+    "manage": {
+      "addTitle": "Add {{noun}}",
+      "editTitle": "Edit {{noun}}",
+      "added": "{{noun}} added.",
+      "updated": "{{noun}} updated.",
+      "deleted": "{{noun}} deleted.",
+      "confirmDelete": "Delete this {{noun}}?",
+      "required": "{{field}} is required.",
+      "optional": "(optional)",
+      "actions": "Actions",
+      "empty": "Nothing here yet."
+    },
+    "nouns": {
+      "package": {
+        "title": "Package",
+        "lower": "package"
+      },
+      "destination": {
+        "title": "Destination",
+        "lower": "destination"
+      },
+      "testimonial": {
+        "title": "Testimonial",
+        "lower": "testimonial"
+      },
+      "post": {
+        "title": "Post",
+        "lower": "post"
+      },
+      "faq": {
+        "title": "FAQ",
+        "lower": "faq"
+      }
+    },
+    "packages": {
+      "heading": "Travel packages",
+      "fields": {
+        "title": "Title",
+        "destination": "Destination",
+        "category": "Category",
+        "price": "Price per person (LKR)",
+        "days": "Duration (days)",
+        "description": "Description",
+        "featured": "Featured on the home page"
+      },
+      "columns": {
+        "title": "Title",
+        "destination": "Destination",
+        "category": "Category",
+        "price": "Price",
+        "days": "Days",
+        "featured": "Featured"
+      }
+    },
+    "destinations": {
+      "heading": "Destinations",
+      "fields": {
+        "name": "Name",
+        "country": "Country",
+        "region": "Region",
+        "description": "Description"
+      },
+      "columns": {
+        "name": "Name",
+        "country": "Country",
+        "region": "Region"
+      }
+    },
+    "customers": {
+      "heading": "Customer accounts",
+      "headers": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "joined": "Joined",
+        "bookings": "Bookings",
+        "account": "Account",
+        "action": "Action"
+      },
+      "active": "Active",
+      "disabled": "Disabled",
+      "disable": "Disable",
+      "enable": "Enable",
+      "roles": {
+        "customer": "customer",
+        "admin": "admin"
+      }
+    },
+    "content": {
+      "testimonials": {
+        "heading": "Traveller testimonials",
+        "fields": {
+          "name": "Traveller name",
+          "quote": "Quote",
+          "rating": "Rating (1 to 5)"
+        },
+        "columns": {
+          "name": "Name",
+          "quote": "Quote",
+          "rating": "Rating"
+        }
+      },
+      "posts": {
+        "heading": "Travel journal posts",
+        "fields": {
+          "title": "Title",
+          "body": "Text"
+        },
+        "columns": {
+          "title": "Title",
+          "body": "Text"
+        }
+      },
+      "faqs": {
+        "heading": "Frequently asked questions",
+        "fields": {
+          "question": "Question",
+          "answer": "Answer"
+        },
+        "columns": {
+          "question": "Question",
+          "answer": "Answer"
+        }
+      }
+    },
+    "messages": {
+      "heading": "Contact form messages",
+      "headers": {
+        "received": "Received",
+        "name": "Name",
+        "email": "Email",
+        "message": "Message"
+      },
+      "none": "No messages yet."
+    },
+    "currencies": {
+      "heading": "Currencies and exchange rates",
+      "refresh": "Refresh rates now",
+      "refreshed": "Rates refreshed.",
+      "add": "Add currency",
+      "addTitle": "Add a currency",
+      "added": "{{code}} added.",
+      "deleted": "{{code}} deleted.",
+      "confirmDelete": "Delete {{code}} from the list?",
+      "updated": "Rates updated {{date}} ({{source}}).",
+      "source": {
+        "live": "live from the rate service",
+        "fallback": "starting rates, the service has not answered yet"
+      },
+      "headers": {
+        "code": "Code",
+        "name": "Name",
+        "locale": "Locale",
+        "rate": "Rate (1 LKR =)",
+        "rateDate": "Rate date",
+        "status": "Status"
+      },
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "enable": "Enable",
+      "disable": "Disable",
+      "base": "Base currency",
+      "form": {
+        "code": "Currency code",
+        "name": "Name",
+        "locale": "Locale",
+        "localePlaceholder": "e.g. en-AU"
+      }
+    },
+    "site": {
+      "heading": "Site settings",
+      "intro": "Contact details and links shown in the footer, on the About page and in search results.",
+      "saved": "Site settings saved.",
+      "fields": {
+        "address": "Full address",
+        "street": "Street",
+        "locality": "Town",
+        "region": "Region",
+        "phone": "Phone",
+        "email": "Email",
+        "founded": "Year founded",
+        "facebook": "Facebook link",
+        "instagram": "Instagram link",
+        "tiktok": "TikTok link",
+        "map_lat": "Map latitude",
+        "map_lon": "Map longitude"
+      }
+    }
+  },
+  "gallery": {
+    "eyebrow": "Gallery",
+    "heading": "Destination highlights",
+    "intro": "A taste of the experiences waiting on your next SkyTrail journey.",
+    "journalTitle": "From the journal",
+    "journalSub": "Tips and stories from our destinations.",
+    "loadingPosts": "Loading posts…",
+    "journalNo": "Journal · No. {{n}}"
+  },
+  "about": {
+    "eyebrow": "About",
+    "heading": "About SkyTrail Travels",
+    "intro": "Your trusted travel partner since 2015.",
+    "storyTitle": "Our Story",
+    "story": "SkyTrail Travels is a growing Sri Lankan travel and tourism agency offering local and international holiday packages, adventure tours, corporate travel arrangements, honeymoon packages, hotel reservations and customised travel experiences. We've helped thousands of travellers explore Sri Lanka's hill country, beaches and wildlife, along with international escapes across Asia and the Indian Ocean.",
+    "missionTitle": "Our Mission",
+    "mission": "To make unforgettable travel experiences accessible, transparent and stress-free, from the first enquiry to the final day of your trip.",
+    "visit": "Visit",
+    "call": "Call",
+    "email": "Email",
+    "follow": "Follow",
+    "mapTitle": "Map of {{locality}}, {{region}}, where SkyTrail Travels is based",
+    "mapCaption": "{{locality}}, {{region}} (approximate location).",
+    "mapLink": "View larger map",
+    "faqTitle": "Frequently asked questions",
+    "contactTitle": "Get in touch",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "send": "Send Message",
+      "failed": "Could not send your message."
+    }
+  },
+  "privacy": {
+    "eyebrow": "Legal",
+    "heading": "Privacy policy",
+    "intro": "What we collect, why we collect it and how we look after it.",
+    "sections": {
+      "collect": {
+        "title": "What we collect",
+        "text": "When you create an account we store your name, email address and a hashed copy of your password (we never store the password itself). When you send a booking enquiry we store the traveller name, email, phone number, travel date, number of travellers and any special requests. Messages sent through the contact form are stored with the name and email you give us."
+      },
+      "why": {
+        "title": "Why we collect it",
+        "text": "We use this information only to run your account, answer your enquiries and arrange the trips you ask for. We do not sell your data and we do not use it for advertising."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "text": "The site sets one session cookie when you log in so that we know who you are between pages. It is marked HttpOnly and SameSite so scripts and other sites cannot read it, and it expires after four hours. We do not use analytics or advertising cookies."
+      },
+      "third": {
+        "title": "Third parties",
+        "text": "The fonts are served from this site. The map on the About page is loaded from OpenStreetMap, so your browser contacts that service directly and it can see your IP address. Exchange rates are fetched by our server, not by your browser. Nothing else is shared with other companies."
+      },
+      "keep": {
+        "title": "How long we keep it",
+        "text": "We keep account and booking records for as long as your account exists. You can ask us to delete your account and personal data at any time."
+      },
+      "rights": {
+        "title": "Your rights",
+        "text": "Under Sri Lanka's Personal Data Protection Act, No. 9 of 2022, you can ask to see the data we hold about you, have it corrected, or have it deleted. Email enquiries@skytrailtravels.lk and we will reply within a reasonable time."
+      },
+      "changes": {
+        "title": "Changes to this policy",
+        "text": "If we change how we use your data we will update this page."
+      }
+    }
+  },
+  "notFound": {
+    "eyebrow": "Error 404",
+    "heading": "We can't find that page",
+    "intro": "The link may be old, or the address may have a typo.",
+    "try": "Try one of these instead:",
+    "home": "Home",
+    "browse": "Browse packages"
+  },
+  "price": {
+    "lkr": "LKR {{amount}}"
+  },
+  "currency": {
+    "label": "Currency",
+    "approx": "≈ {{amount}}",
+    "note": "Prices in other currencies are converted from LKR with daily exchange rates (last updated {{date}}) and are only a guide. Bookings are confirmed and charged in LKR.",
+    "credit": "Rates by Exchange Rate API"
+  },
+  "credits": {
+    "eyebrow": "Credits",
+    "heading": "Photo credits and sources",
+    "intro": "Thank you to everyone whose work appears on this site.",
+    "photosTitle": "Destination photographs",
+    "photosIntro": "Every destination photo comes from Wikimedia Commons and is used under the licence shown. We cropped each one to a 3:2 shape and made smaller copies so pages load faster.",
+    "place": "Destination",
+    "author": "Photographer",
+    "license": "Licence",
+    "source": "Source",
+    "sourceLink": "Wikimedia Commons",
+    "photoLine": "Photo: {{author}}, {{license}}.",
+    "seeAll": "Photo credits",
+    "othersTitle": "Other sources",
+    "fonts": "Fraunces and Work Sans, under the SIL Open Font Licence, served from this site.",
+    "map": "The map on the About page is © OpenStreetMap contributors, available under the Open Database Licence.",
+    "rates": "Exchange rates by Exchange Rate API.",
+    "factsTitle": "Facts we checked",
+    "factsIntro": "Heritage dates and landmark heights in the destination descriptions were checked against these pages.",
+    "unescoSigiriya": "UNESCO World Heritage Centre: Ancient City of Sigiriya",
+    "unescoGalle": "UNESCO World Heritage Centre: Old Town of Galle and its Fortifications",
+    "burj": "Burj Khalifa: Facts and figures",
+    "ratesLink": "exchangerate-api.com"
+  }
+}
