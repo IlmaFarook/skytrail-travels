@@ -6,6 +6,7 @@ import { api } from '../api';
 import { useCurrency } from '../context/CurrencyContext';
 import CurrencyNote from '../components/CurrencyNote';
 import { useAuth } from '../context/AuthContext';
+import { useConfirm } from '../context/ConfirmContext';
 import { useRules } from '../context/SiteContext';
 import usePageMeta from '../hooks/usePageMeta';
 import PhoneInput from '../components/PhoneInput';
@@ -19,6 +20,7 @@ export default function MyBookingsPage() {
   const { config, travellersOk, dateOk } = useRules();
   usePageMeta(t('meta.myBookings.title'), t('meta.myBookings.description'));
   const { user, loading } = useAuth();
+  const confirm = useConfirm();
   const [bookings, setBookings] = useState(null);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ phone: '', travel_date: '', travellers: '', special_requests: '' });
@@ -71,7 +73,12 @@ export default function MyBookingsPage() {
   };
 
   const cancel = async (b) => {
-    if (!window.confirm(t('myBookings.confirmCancel', { title: b.package_title }))) return;
+    const sure = await confirm({
+      title: t('myBookings.cancelTitle'),
+      message: t('myBookings.confirmCancel', { title: b.package_title }),
+      confirmLabel: t('myBookings.cancelConfirm'),
+    });
+    if (!sure) return;
     setAlert(null);
     try {
       await api.cancelBooking(b.id);
@@ -118,7 +125,7 @@ export default function MyBookingsPage() {
                   <td className="row-actions">
                     {b.status === 'Pending' && <button type="button" className="btn btn-outline btn-sm" onClick={() => startEdit(b)}>{t('common.edit')}</button>}
                     {(b.status === 'Pending' || b.status === 'Confirmed') && <button type="button" className="btn btn-outline btn-sm" onClick={() => cancel(b)}>{t('common.cancel')}</button>}
-                    {(b.status === 'Cancelled' || b.status === 'Completed') && <span className="muted">{t('common.na')}</span>}
+                    {(b.status === 'Cancelled' || b.status === 'Completed') && <span className="muted">{t('myBookings.noChanges')}</span>}
                   </td>
                 </tr>
               ))}

@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useConfirm } from '../../context/ConfirmContext';
 
 export default function CurrenciesTab() {
   const { t } = useTranslation();
+  const confirm = useConfirm();
   const { reload: reloadPublicList } = useCurrency();
   const [info, setInfo] = useState(null);
   const [message, setMessage] = useState('');
@@ -36,8 +38,13 @@ export default function CurrenciesTab() {
 
   const toggle = (c) => run(() => api.adminUpdateCurrency(c.code, !c.enabled));
 
-  const remove = (c) => {
-    if (!window.confirm(t('admin.currencies.confirmDelete', { code: c.code }))) return;
+  const remove = async (c) => {
+    const sure = await confirm({
+      title: t('admin.currencies.confirmDelete', { code: c.code }),
+      message: t('common.cannotUndo'),
+      confirmLabel: t('common.delete'),
+    });
+    if (!sure) return;
     run(() => api.adminDeleteCurrency(c.code), t('admin.currencies.deleted', { code: c.code }));
   };
 
@@ -96,7 +103,7 @@ export default function CurrenciesTab() {
                 <td>{c.name}</td>
                 <td>{c.locale}</td>
                 <td>{c.code === 'LKR' ? '1' : Number(c.rate).toPrecision(4)}</td>
-                <td>{c.rate_date || t('common.na')}</td>
+                <td>{c.rate_date || t('admin.currencies.baseCurrency')}</td>
                 <td><span className={`status-pill ${c.enabled ? 'status-Confirmed' : 'status-Cancelled'}`}>{c.enabled ? t('admin.currencies.enabled') : t('admin.currencies.disabled')}</span></td>
                 <td className="row-actions">
                   {c.code === 'LKR'

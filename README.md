@@ -21,7 +21,7 @@ npm run build     # installs the client packages and builds the React app into .
 npm start         # serves everything on http://localhost:3000
 ```
 
-The built app is already in `public/`, so `npm start` alone is enough to look at the site. The database is created on the first request.
+The built site in `public/` is not kept in git. The first `npm start` builds it if it is missing (about a minute, it needs internet for the packages). The database is created on the first request.
 
 `npm start` serves the files that were built, so a change shows only after `npm run build` and a refresh. For front-end work with live updates run `npm run dev` and open http://localhost:5173. It starts the PHP site on port 3000 too (or uses the one already running), and Vite sends `/api` requests to it.
 

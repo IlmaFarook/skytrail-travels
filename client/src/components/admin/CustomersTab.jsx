@@ -53,7 +53,7 @@ export default function CustomersTab() {
                 <td>
                   {u.role === 'customer'
                     ? <button type="button" className="btn btn-outline btn-sm" onClick={() => toggle(u)}>{u.is_active ? t('admin.customers.disable') : t('admin.customers.enable')}</button>
-                    : <span className="muted">{t('common.na')}</span>}
+                    : <span className="muted">{t('admin.customers.staffAccount')}</span>}
                 </td>
               </tr>
             ))}

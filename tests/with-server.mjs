@@ -4,6 +4,9 @@ import { spawn } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { ensureBuild } from '../bin/ensure-build.mjs';
+
+ensureBuild();
 
 const port = process.env.TEST_PORT || '3100';
 const db = join(tmpdir(), 'skytrail-test.db'); // outside the project, so OneDrive never syncs it

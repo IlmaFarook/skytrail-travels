@@ -1,9 +1,0 @@
-/* loaded only when JavaScript is off: show the page the server built */
-body { background: #f6f8fb; color: #14202e; font-family: "Work Sans", system-ui, sans-serif; line-height: 1.6; }
-.ssr-page { position: static !important; width: auto !important; height: auto !important; overflow: visible !important; clip: auto !important; white-space: normal !important; max-width: 760px; margin: 0 auto; padding: 1.5rem 1.4rem 3rem; }
-.ssr-page nav { margin-bottom: 1.5rem; font-size: .9rem; }
-.ssr-page a { color: #0b6070; }
-.ssr-page h1, .ssr-page h2, .ssr-page h3 { font-family: "Fraunces", Georgia, serif; line-height: 1.15; }
-.ssr-page img { max-width: 100%; height: auto; display: block; margin: 1rem 0; }
-.ssr-page li { margin-bottom: .9rem; }
-.ssr-page blockquote { margin: 0 0 1rem; font-style: italic; }

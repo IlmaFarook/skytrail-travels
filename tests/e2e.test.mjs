@@ -221,8 +221,17 @@ test('customer can book, edit and cancel', async () => {
   await page.waitForSelector('.alert-success:has-text("updated")');
   assert.match(await page.locator('tbody tr').first().innerText(), /\b4\b/);
 
-  page.once('dialog', d => d.accept());
+  // a proper dialog, not the browser's pop-up: Escape and "Go back" keep the booking
   await page.click('button:has-text("Cancel") >> nth=0');
+  await page.waitForSelector('dialog[open] h2:has-text("Cancel this booking?")');
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('dialog', { state: 'detached' });
+  assert.match(await page.locator('tbody tr').first().innerText(), /pending/i);
+  await page.click('button:has-text("Cancel") >> nth=0');
+  await page.click('dialog[open] button:has-text("Go back")');
+  assert.match(await page.locator('tbody tr').first().innerText(), /pending/i);
+  await page.click('button:has-text("Cancel") >> nth=0');
+  await page.click('dialog[open] .modal-confirm');
   await page.waitForSelector('.alert-success:has-text("cancelled")');
   assert.match(await page.locator('tbody tr').first().innerText(), /cancelled/i);
   await page.context().close();
@@ -272,14 +281,14 @@ test('admin can manage packages, customers, content and read messages', async ()
   await page.fill('#Package-price', '34567');
   await page.click('form button:has-text("Save")');
   await page.waitForSelector(`tr:has-text("Browser Test Package ${stamp}"):has-text("34,567")`);
-  page.once('dialog', d => d.accept());
   await page.click(`tr:has-text("Browser Test Package ${stamp}") button:has-text("Delete")`);
+  await page.click('dialog[open] .modal-confirm');
   await page.waitForSelector(`tr:has-text("Browser Test Package ${stamp}")`, { state: 'detached' });
 
   // a package with bookings cannot be deleted
   expectedStatus = '409';
-  page.once('dialog', d => d.accept());
   await page.click('tr:has-text("Kandy Cultural Discovery") button:has-text("Delete")');
+  await page.click('dialog[open] .modal-confirm');
   await page.waitForSelector('.alert-error:has-text("has bookings")');
   expectedStatus = null;
 

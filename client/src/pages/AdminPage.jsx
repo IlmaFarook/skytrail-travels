@@ -56,10 +56,10 @@ export default function AdminPage() {
       <div className="page-header"><div className="container container-wide"><p className="eyebrow">{t('admin.eyebrow')}</p><h1>{t('admin.heading')}</h1><p>{t('admin.intro')}</p></div></div>
       <section className="container container-wide">
         <div className="stats">
-          <div className="stat"><span className="stat-n">{stats?.totalBookings ?? t('common.na')}</span><span className="stat-l">{t('admin.stats.total')}</span></div>
-          <div className="stat"><span className="stat-n">{stats?.pendingBookings ?? t('common.na')}</span><span className="stat-l">{t('admin.stats.pending')}</span></div>
-          <div className="stat"><span className="stat-n">{stats?.totalUsers ?? t('common.na')}</span><span className="stat-l">{t('admin.stats.customers')}</span></div>
-          <div className="stat"><span className="stat-n">{stats?.totalPackages ?? t('common.na')}</span><span className="stat-l">{t('admin.stats.packages')}</span></div>
+          <div className="stat"><span className="stat-n">{stats?.totalBookings ?? t('common.loadingShort')}</span><span className="stat-l">{t('admin.stats.total')}</span></div>
+          <div className="stat"><span className="stat-n">{stats?.pendingBookings ?? t('common.loadingShort')}</span><span className="stat-l">{t('admin.stats.pending')}</span></div>
+          <div className="stat"><span className="stat-n">{stats?.totalUsers ?? t('common.loadingShort')}</span><span className="stat-l">{t('admin.stats.customers')}</span></div>
+          <div className="stat"><span className="stat-n">{stats?.totalPackages ?? t('common.loadingShort')}</span><span className="stat-l">{t('admin.stats.packages')}</span></div>
         </div>
 
         <div className="tabs" role="tablist" aria-label={t('admin.tablist')}>

@@ -44,9 +44,9 @@ export default function HomePage() {
             <p className="lede">{t('home.lede')}</p>
             <SearchBox />
             <dl className="hero-stats">
-              <div><dt>{t('home.stats.est')}</dt><dd>{business ? business.founded : t('common.na')}</dd></div>
-              <div><dt>{t('home.stats.destinations')}</dt><dd><Link to="/destinations">{stats ? stats.destinations : t('common.na')}</Link></dd></div>
-              <div><dt>{t('home.stats.journeys')}</dt><dd><Link to="/destinations">{stats ? stats.packages : t('common.na')}</Link></dd></div>
+              <div><dt>{t('home.stats.est')}</dt><dd>{business ? business.founded : t('common.loadingShort')}</dd></div>
+              <div><dt>{t('home.stats.destinations')}</dt><dd><Link to="/destinations">{stats ? stats.destinations : t('common.loadingShort')}</Link></dd></div>
+              <div><dt>{t('home.stats.journeys')}</dt><dd><Link to="/destinations">{stats ? stats.packages : t('common.loadingShort')}</Link></dd></div>
             </dl>
           </div>
           <div className="hero-art" aria-hidden="true">

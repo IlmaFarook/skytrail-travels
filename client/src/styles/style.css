@@ -918,3 +918,13 @@ main { min-height: calc(100vh - 80px); }
   .manage table.data-table th { white-space: normal; letter-spacing: .06em; font-size: .62rem; }
   .manage table.data-table select { max-width: 8rem; }
 }
+
+/* confirmation dialog */
+dialog.modal { padding: 0; width: min(28rem, calc(100vw - 2rem)); border: 1.5px solid var(--ink); background: var(--paper-3); color: var(--ink); box-shadow: 8px 8px 0 var(--ink); }
+dialog.modal::backdrop { background: color-mix(in srgb, var(--ink) 55%, transparent); }
+.modal-body { padding: 1.6rem; }
+.modal-body h2 { font-size: 1.35rem; margin: 0 0 .6rem; }
+.modal-body p { margin: 0 0 1.4rem; color: var(--muted); }
+.modal-actions { display: flex; justify-content: flex-end; gap: .7rem; flex-wrap: wrap; }
+.btn-danger { background: var(--red); border-color: var(--red); color: var(--white); }
+.btn-danger:hover { background: var(--bad-text); border-color: var(--bad-text); box-shadow: none; }

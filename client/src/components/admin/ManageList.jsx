@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useConfirm } from '../../context/ConfirmContext';
 
 // Table with add, edit and delete, used by most admin tabs.
 // kind picks the wording (admin.nouns.<kind>), idPrefix keeps input ids stable.
 export default function ManageList({ title, kind, idPrefix, load, create, update, remove, columns, fields, blank }) {
   const { t } = useTranslation();
+  const confirm = useConfirm();
   const noun = t(`admin.nouns.${kind}.title`);
   const nounLower = t(`admin.nouns.${kind}.lower`);
 
@@ -63,7 +65,12 @@ export default function ManageList({ title, kind, idPrefix, load, create, update
   };
 
   const onDelete = async (item) => {
-    if (!window.confirm(t('admin.manage.confirmDelete', { noun: nounLower }))) return;
+    const sure = await confirm({
+      title: t('admin.manage.confirmDelete', { noun: nounLower }),
+      message: t('common.cannotUndo'),
+      confirmLabel: t('common.delete'),
+    });
+    if (!sure) return;
     setError('');
     setMessage('');
     try {

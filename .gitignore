@@ -7,6 +7,9 @@ db/*.db-shm
 db/*.db-wal
 db/backups/
 
+# the built site (npm run build creates it, npm start builds it if it is missing)
+public/
+
 # system files and logs
 .DS_Store
 *.log

@@ -2,6 +2,9 @@
 // connection can hold up every other request.
 import './env.mjs';
 import { spawnSync, spawn } from 'node:child_process';
+import { ensureBuild } from './ensure-build.mjs';
+
+ensureBuild();
 
 // keep a copy of the data every time the site starts
 spawnSync('php', ['bin/backup-db.php'], { stdio: 'inherit' });

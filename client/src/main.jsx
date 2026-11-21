@@ -7,6 +7,7 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { SiteProvider } from './context/SiteContext.jsx';
 import { CompareProvider } from './context/CompareContext.jsx';
 import { CurrencyProvider } from './context/CurrencyContext.jsx';
+import { ConfirmProvider } from './context/ConfirmContext.jsx';
 import './styles/style.css';
 
 // After a new build the old page files are gone. Reload once to pick up the new ones.
@@ -30,7 +31,9 @@ fontsReady.then(() => createRoot(document.getElementById('root')).render(
         <SiteProvider>
           <CurrencyProvider>
             <CompareProvider>
-              <App />
+              <ConfirmProvider>
+                <App />
+              </ConfirmProvider>
             </CompareProvider>
           </CurrencyProvider>
         </SiteProvider>

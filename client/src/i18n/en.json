@@ -65,7 +65,6 @@
     "reload": "Reload the page"
   },
   "common": {
-    "na": "n/a",
     "loading": "Loading…",
     "clear": "Clear",
     "edit": "Edit",
@@ -82,7 +81,10 @@
     "perPerson": "per person",
     "ratingShort": "{{rating}}/5",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "goBack": "Go back",
+    "cannotUndo": "This cannot be undone.",
+    "loadingShort": "…"
   },
   "status": {
     "Pending": "Pending",
@@ -309,14 +311,17 @@
     "empty": "You have no bookings yet.",
     "updated": "Your booking was updated.",
     "cancelled": "Your booking was cancelled.",
-    "confirmCancel": "Cancel your booking for {{title}}?",
+    "confirmCancel": "Your booking for {{title}} will be cancelled. You can send a new enquiry whenever you like.",
     "note": "Total price is the package price multiplied by the number of travellers. Confirmed bookings can be cancelled but not edited, please contact us to change those.",
     "editTitle": "Edit booking: {{title}}",
     "phone": "Phone number",
     "date": "Travel date",
     "travellers": "Number of travellers",
     "requests": "Special requests",
-    "saveChanges": "Save changes"
+    "saveChanges": "Save changes",
+    "cancelTitle": "Cancel this booking?",
+    "cancelConfirm": "Yes, cancel booking",
+    "noChanges": "No changes possible"
   },
   "compare": {
     "barLabel": "Packages selected for comparison",
@@ -473,7 +478,8 @@
       "roles": {
         "customer": "customer",
         "admin": "admin"
-      }
+      },
+      "staffAccount": "Staff account, cannot be disabled here"
     },
     "content": {
       "testimonials": {
@@ -554,7 +560,8 @@
         "name": "Name",
         "locale": "Locale",
         "localePlaceholder": "e.g. en-AU"
-      }
+      },
+      "baseCurrency": "Base currency (always 1)"
     },
     "site": {
       "heading": "Site settings",
