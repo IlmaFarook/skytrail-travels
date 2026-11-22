@@ -32,6 +32,7 @@ function futureDate(days) {
 }
 
 let browser;
+let currentTest = '';
 const consoleErrors = [];
 let expectedStatus = null; // set while a test deliberately triggers an error response, e.g. '409'
 
@@ -42,9 +43,9 @@ function watch(page) {
     const text = m.text();
     if (m.type() !== 'error' || text.includes('fonts.googleapis.com')) return;
     if (expectedStatus && text.includes(expectedStatus)) return;
-    consoleErrors.push(text);
+    consoleErrors.push(`${currentTest}: ${text}`);
   });
-  page.on('pageerror', e => consoleErrors.push(e.message));
+  page.on('pageerror', e => consoleErrors.push(`${currentTest}: ${e.message}`));
 }
 
 async function newPage(options = {}, watched = true) {
@@ -74,6 +75,7 @@ async function login(page, who, pass) {
 }
 
 test.before(async () => { browser = await playwright[engine].launch(); });
+test.beforeEach((t) => { currentTest = t.name; });
 test.after(async () => { await browser.close(); });
 
 test('home page shows the new content and the right title', async () => {
@@ -628,6 +630,7 @@ test('search box suggests matches and popular destinations, and works from the k
   assert.equal(await page.getAttribute('[role="option"]:first-child', 'aria-selected'), 'true');
   await page.keyboard.press('Enter');
   await page.waitForURL(/\/destinations\?destination=\d+/);
+  await page.waitForSelector('.card'); // the page has its data, nothing is cut off when we leave
 
   await page.goto(BASE + '/');
   await page.click('.search-bar input');
@@ -639,6 +642,7 @@ test('search box suggests matches and popular destinations, and works from the k
   await page.click('.search-bar input');
   await page.click('.suggest-popular a');
   await page.waitForURL(/\/destinations\?destination=\d+/);
+  await page.waitForSelector('.card'); // the page has its data, nothing is cut off when we leave
 });
 
 test('featured journeys open the package when any part of the card is clicked', async () => {
@@ -648,19 +652,24 @@ test('featured journeys open the package when any part of the card is clicked', 
   // force: the card's own link covers it, so playwright would otherwise wait for the cover to go away
   await page.locator('.card .desc').first().click({ force: true });
   await page.waitForURL(/\/packages\/\d+/);
+  await page.waitForSelector('.detail-art img');
   await page.goto(BASE + '/');
   await page.getByRole('link', { name: 'Featured journeys' }).click();
   await page.waitForURL(/\/destinations$/);
+  await page.waitForSelector('.card');
 });
 
 test('login and private pages: no login form for people already in, and a way back after logging in', async () => {
   // a signed-in customer who opens the login or register page is sent home
   const page = await newPage();
   await login(page, email, password);
-  await page.goto(BASE + '/login');
+  await quiet_network(page);
+  await page.goto(BASE + '/login', { waitUntil: 'commit' });
   await page.waitForURL(BASE + '/');
-  await page.goto(BASE + '/register');
+  await quiet_network(page);
+  await page.goto(BASE + '/register', { waitUntil: 'commit' });
   await page.waitForURL(BASE + '/');
+  await quiet_network(page);
 
   // the login runs out in the background: the next private page sends them to log in again
   expectedStatus = '401'; // the browser logs the refused request, that is the point of this step
@@ -691,9 +700,13 @@ test('login and private pages: no login form for people already in, and a way ba
   await staff.fill('#password', 'Admin@123');
   await staff.click('button[type="submit"]');
   await staff.waitForURL(/\/admin$/);
-  await staff.goto(BASE + '/login');
+  await staff.waitForSelector('tbody tr'); // let the admin page finish loading before leaving it
+  await quiet_network(staff);
+  await staff.goto(BASE + '/login', { waitUntil: 'commit' });
   await staff.waitForURL(/\/admin$/);
-  await staff.goto(BASE + '/my-bookings');
+  await staff.waitForSelector('tbody tr');
+  await quiet_network(staff);
+  await staff.goto(BASE + '/my-bookings', { waitUntil: 'commit' });
   await staff.waitForURL(/\/admin$/);
   await staff.context().close();
 

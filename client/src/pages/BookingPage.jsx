@@ -9,7 +9,8 @@ import usePageMeta from '../hooks/usePageMeta';
 import PhoneInput from '../components/PhoneInput';
 import DateField from '../components/DateField';
 import LimitedTextarea from '../components/LimitedTextarea';
-import { cleanName, emailAttrs } from '../lib/forms';
+import NameInput from '../components/NameInput';
+import { emailAttrs } from '../lib/forms';
 import { phoneValid } from '../lib/phone';
 
 
@@ -101,8 +102,7 @@ export default function BookingPage() {
             <form className="form-card" onSubmit={onSubmit} noValidate>
               <div className={`form-group${errors.full_name ? ' has-error' : ''}`}>
                 <label htmlFor="full_name">{t('booking.fullName')}</label>
-                <input id="full_name" value={form.full_name} maxLength={config?.nameMax} autoComplete="name"
-                  onChange={(e) => setForm(f => ({ ...f, full_name: cleanName(e.target.value, config) }))} />
+                <NameInput id="full_name" value={form.full_name} onChange={(full_name) => setForm(f => ({ ...f, full_name }))} />
                 <div className="error-text">{t('validation.fullName', { max: config?.nameMax ?? '' })}</div>
               </div>
               <div className={`form-group${errors.email ? ' has-error' : ''}`}>

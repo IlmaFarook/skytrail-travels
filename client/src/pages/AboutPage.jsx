@@ -5,7 +5,8 @@ import { useRules, useSite } from '../context/SiteContext';
 import usePageMeta from '../hooks/usePageMeta';
 import SocialLinks from '../components/SocialLinks';
 import LimitedTextarea from '../components/LimitedTextarea';
-import { cleanName, emailAttrs } from '../lib/forms';
+import NameInput from '../components/NameInput';
+import { emailAttrs } from '../lib/forms';
 
 
 // a small window around the business position
@@ -107,8 +108,7 @@ export default function AboutPage() {
         <form className="form-card" onSubmit={onSubmit} noValidate>
           <div className={`form-group${errors.name ? ' has-error' : ''}`}>
             <label htmlFor="c-name">{t('about.form.name')}</label>
-            <input id="c-name" value={form.name} maxLength={config?.nameMax} autoComplete="name"
-              onChange={(e) => setForm(f => ({ ...f, name: cleanName(e.target.value, config) }))} />
+            <NameInput id="c-name" value={form.name} onChange={(name) => setForm(f => ({ ...f, name }))} />
             <div className="error-text">{t('validation.name', { max: config?.nameMax ?? '' })}</div>
           </div>
           <div className={`form-group${errors.email ? ' has-error' : ''}`}>

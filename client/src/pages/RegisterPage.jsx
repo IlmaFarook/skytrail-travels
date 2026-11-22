@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useRules } from '../context/SiteContext';
 import usePageMeta from '../hooks/usePageMeta';
-import { cleanName, emailAttrs } from '../lib/forms';
+import NameInput from '../components/NameInput';
+import { emailAttrs } from '../lib/forms';
 import { safePath, homeFor } from '../lib/access';
 
 
@@ -48,8 +49,7 @@ export default function RegisterPage() {
         <form className="form-card" onSubmit={onSubmit} noValidate>
           <div className={`form-group${errors.name ? ' has-error' : ''}`}>
             <label htmlFor="name">{t('auth.register.name')}</label>
-            <input id="name" value={form.name} maxLength={config?.nameMax} autoComplete="name"
-              onChange={(e) => setForm(f => ({ ...f, name: cleanName(e.target.value, config) }))} />
+            <NameInput id="name" value={form.name} onChange={(name) => setForm(f => ({ ...f, name }))} />
             <div className="error-text">{t('validation.fullName', { max: config?.nameMax ?? '' })}</div>
           </div>
           <div className={`form-group${errors.email ? ' has-error' : ''}`}>
