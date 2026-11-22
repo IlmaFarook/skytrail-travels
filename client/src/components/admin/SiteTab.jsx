@@ -13,7 +13,6 @@ const fields = [
   { name: 'founded', type: 'number' },
   { name: 'facebook', type: 'url' },
   { name: 'instagram', type: 'url' },
-  { name: 'tiktok', type: 'url' },
   { name: 'map_lat', type: 'number' },
   { name: 'map_lon', type: 'number' },
 ];

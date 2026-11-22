@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useSite } from '../context/SiteContext';
 
-const networks = ['facebook', 'instagram', 'tiktok'];
+const networks = ['facebook', 'instagram'];
 
 export default function SocialLinks() {
   const { t } = useTranslation();

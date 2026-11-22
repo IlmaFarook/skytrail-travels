@@ -43,8 +43,7 @@
   },
   "social": {
     "facebook": "Facebook",
-    "instagram": "Instagram",
-    "tiktok": "TikTok"
+    "instagram": "Instagram"
   },
   "search": {
     "matches": "Matches",
@@ -577,7 +576,6 @@
         "founded": "Year founded",
         "facebook": "Facebook link",
         "instagram": "Instagram link",
-        "tiktok": "TikTok link",
         "map_lat": "Map latitude",
         "map_lon": "Map longitude"
       }

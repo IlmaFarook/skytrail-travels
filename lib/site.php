@@ -3,7 +3,7 @@
 
 $business_keys = [
     'address', 'street', 'locality', 'region', 'country_code',
-    'phone', 'email', 'founded', 'facebook', 'instagram', 'tiktok', 'map_lat', 'map_lon',
+    'phone', 'email', 'founded', 'facebook', 'instagram', 'map_lat', 'map_lon',
 ];
 
 function business($db) {
@@ -35,7 +35,7 @@ function business_for_client($db) {
         'phoneLink' => phone_link($b['phone']),
         'email' => $b['email'],
         'founded' => $b['founded'],
-        'social' => ['facebook' => $b['facebook'], 'instagram' => $b['instagram'], 'tiktok' => $b['tiktok']],
+        'social' => ['facebook' => $b['facebook'], 'instagram' => $b['instagram']],
         'map' => ['lat' => (float) $b['map_lat'], 'lon' => (float) $b['map_lon']],
     ];
 }
@@ -57,7 +57,7 @@ function site_error($b) {
     if (!is_numeric($founded) || (int) $founded < 1900 || (int) $founded > (int) date('Y')) {
         return t('site.founded');
     }
-    foreach (['facebook', 'instagram', 'tiktok'] as $network) {
+    foreach (['facebook', 'instagram'] as $network) {
         $url = isset($b[$network]) && is_string($b[$network]) ? trim($b[$network]) : '';
         if (!preg_match('#^https://[^\s]+$#', $url) || strlen($url) > 200) {
             return t('site.url');
